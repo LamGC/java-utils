@@ -1,4 +1,7 @@
 
+# Ignore Maven build
+target
+
 # Ignore VSCode files
 .settings
 .classpath
