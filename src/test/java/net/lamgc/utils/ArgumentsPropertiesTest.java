@@ -13,7 +13,7 @@ public class ArgumentsPropertiesTest{
     public void loadTest(){
         //解析参数
         ArgumentsProperties argsProperties = new ArgumentsProperties(argsList);
-        System.out.println(Arrays.toString(argsProperties.getKeyList().toArray(new String[0])));
+        System.out.println(Arrays.toString(argsProperties.getKeysWithFlag().toArray(new String[0])));
         for(String key : argsProperties.keySet().toArray(new String[0])){
             System.out.println(key + ": " + argsProperties.get(key));
         }
