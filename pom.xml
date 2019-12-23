@@ -8,15 +8,38 @@
   <artifactId>java-utils</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <packaging>jar</packaging>
+
   <name>java-utils</name>
+  <description>A collection of tool classes.</description>
+  <url>https://github.com/LamGC/java-utils</url>
+
 
   <developers>
     <developer>
       <name>LamGC</name>
       <email>lam827@lamgc.net</email>
       <timezone>+8</timezone>
+      <roles>
+        <role>Project Manager</role>
+        <role>Major contributors</role>
+      </roles>
     </developer>
   </developers>
+
+  <scm>
+    <connection>https://github.com/LamGC/java-utils.git</connection>
+    <developerConnection>https://github.com/LamGC/java-utils.git</developerConnection>
+    <url>https://github.com/LamGC/java-utils</url>
+  </scm>
+
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
