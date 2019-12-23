@@ -8,9 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 public class EventExecutorTest {
 
-    private static void handler(SimpleEventObject event) {
-    }
-
     @Test
     public void executorTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
@@ -27,13 +24,14 @@ public class EventExecutorTest {
             }
         });
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
-        executor.addHandler(new SimpleEventHandler());
-        executor.addHandler(new SimpleEventHandler2());
-        executor.addHandler(new SimpleEventHandler3());
-        executor.addHandler(new SimpleEventHandler4());
-        executor.addHandler(new SimpleEventHandler());
+        SimpleEventHandler handler = new SimpleEventHandler();
+        executor.addHandler(handler);
         executor.executor(new SimpleEventObject(1, "HelloWorld"));
-        executor.awaitEventExecutor(10L, TimeUnit.SECONDS);
+        Thread.sleep(500L);
+        executor.removeHandler(handler);
+        System.out.println("已删除Handler");
+        executor.executor(new SimpleEventObject(1, "HelloWorld"));
+        //executor.awaitEventExecutor(10L, TimeUnit.SECONDS);
     }
 
 
