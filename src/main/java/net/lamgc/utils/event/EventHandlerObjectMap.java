@@ -18,4 +18,11 @@ public interface EventHandlerObjectMap {
      * @return 如果找到则返回EventHandler对象, 无则返回null
      */
     EventHandler getHandlerObject(Class<?> eventHandlerClass);
+
+    /**
+     * 删除指定的{@link EventHandler}
+     * @param handler 要删除的Handler
+     */
+    void removeHandlerObject(EventHandler handler);
+
 }

@@ -15,4 +15,9 @@ public class HashHandlerObjectMap implements EventHandlerObjectMap {
     public EventHandler getHandlerObject(Class<?> eventHandlerClass) {
         return handlerMap.get(eventHandlerClass);
     }
+
+    @Override
+    public void removeHandlerObject(EventHandler handler) {
+        handlerMap.remove(handler.getClass());
+    }
 }

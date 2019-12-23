@@ -31,4 +31,17 @@ public interface EventHandlerList {
      */
     void addEventHandlerMethod(Class<? extends EventObject> eventObject, Method eventHandlerMethod);
 
+    /**
+     * 通过{@link EventHandler}对象删除EventHandler
+     * @param handler 要删除的Handler对象
+     */
+    default void removeEventHandler(EventHandler handler){
+        removeEventHandler(handler.getClass());
+    }
+
+    /**
+     * 通过{@link EventHandler}Class删除EventHandler
+     * @param handler 要删除的Handler Class
+     */
+    void removeEventHandler(Class<? extends EventHandler> handler);
 }

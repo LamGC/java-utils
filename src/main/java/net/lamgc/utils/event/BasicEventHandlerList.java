@@ -43,6 +43,27 @@ public class BasicEventHandlerList implements EventHandlerList {
             eventMethodMap.put(eventObject, new HashSet<>());
         }
         eventMethodMap.get(eventObject).add(eventHandlerMethod);
-        //System.out.println("已添加新的Handler方法: Class[" + eventHandlerMethod.getDeclaringClass().getSimpleName() + "] methodName[" + eventHandlerMethod.getName() + "] eventObject[" + eventObject.getSimpleName() + "]");
+    }
+
+    @Override
+    public void removeEventHandler(Class<? extends EventHandler> handler) {
+        Method[] methods = handler.getDeclaredMethods();
+        for(Method method : methods){
+            int modifiers = method.getModifiers();
+            if(!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)){
+                //System.out.println("方法不是公开的/抽象方法/接口方法: " + modifiers);
+                continue;
+            }
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            if(parameterTypes.length != 1){
+                //System.out.println("参数过多: " + parameterTypes.length);
+                continue;
+            }
+            if(!EventObject.class.isAssignableFrom(parameterTypes[0])){
+                //System.out.println("不是EventObject子类");
+                continue;
+            }
+            eventMethodMap.get(parameterTypes[0]).remove(method);
+        }
     }
 }
