@@ -19,15 +19,27 @@ public class ArgumentsProperties extends HashMap<String, String>{
 
     private ArrayList<String> keyList = new ArrayList<>();
 
+    /**
+     * 构造一个ArgumentsProperties.
+     * 该ArgumentsProperties将使用默认的参数标识来解析参数.
+     */
     public ArgumentsProperties(){
         this(null);
     }
 
+    /**
+     * 构造一个ArgumentsProperties并解析参数数组中的参数.
+     * @param args 参数列表, 比如从{@code main(String[] args)}方法参数中获得的参数.
+     */
     public ArgumentsProperties(String[] args){
         this(args, null);
     }
 
-    // 对指定参数提供过滤选项，以在使用不正确选项的时候抛出异常
+    /**
+     * 构造一个ArgumentsProperties
+     * @param args 待解析的参数列表
+     * @param keyFlags 参数Key标识列表
+     */
     public ArgumentsProperties(String[] args, String[] keyFlags){
         this.keyFlags = keyFlags == null ? defaultKeyFlags : keyFlags;
         if(args != null){
