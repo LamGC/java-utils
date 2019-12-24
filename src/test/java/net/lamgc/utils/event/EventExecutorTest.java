@@ -24,9 +24,14 @@ public class EventExecutorTest {
             }
         });
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
-        SimpleEventHandler handler = new SimpleEventHandler();
+        SimpleEventHandler handler = new SimpleEventHandler("handler1");
+        SimpleEventHandler handler2 = new SimpleEventHandler("handler2");
         executor.addHandler(handler);
+        executor.addHandler(handler2);
         executor.executor(new SimpleEventObject(1, "HelloWorld"));
+        Thread.sleep(500L);
+        System.out.println("OnlyHandlerTest-----");
+        executor.executor(handler2, new SimpleEventObject(1, "HelloWorld"));
         Thread.sleep(500L);
         executor.removeHandler(handler);
         System.out.println("deleted Handler");

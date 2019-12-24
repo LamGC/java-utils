@@ -2,8 +2,14 @@ package net.lamgc.utils.event;
 
 public class SimpleEventHandler implements EventHandler {
 
-    public void simpleEventHandler1(SimpleEventObject event){
-        System.out.println(this.getClass().getSimpleName() + " - [" + event.errorCode + "] " + event.msg);
+    private String flag;
+
+    public SimpleEventHandler(String flag){
+        this.flag = flag;
+    }
+
+    public void simpleEventHandler(SimpleEventObject event){
+        System.out.println(this.toString() + "." + flag + " - [" + event.errorCode + "] " + event.msg);
     }
 
 }

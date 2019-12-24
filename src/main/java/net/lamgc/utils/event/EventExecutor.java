@@ -2,6 +2,7 @@ package net.lamgc.utils.event;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
@@ -42,11 +43,13 @@ public class EventExecutor {
         final ThreadFactory threadFactory = this.threadPoolExecutor.getThreadFactory();
         this.threadPoolExecutor.setThreadFactory(r -> {
             Thread newThread = threadFactory.newThread(r);
-            newThread.setUncaughtExceptionHandler((t, e) -> {
-                if(this.exceptionHandler != null){
-                    this.exceptionHandler.uncaughtException(t, e);
-                }
-            });
+            if(newThread.getUncaughtExceptionHandler() == newThread.getThreadGroup()){
+                newThread.setUncaughtExceptionHandler((t, e) -> {
+                    if(this.exceptionHandler != null){
+                        this.exceptionHandler.uncaughtException(t, e);
+                    }
+                });
+            }
             return newThread;
         });
         this.eventHandlerList = eventHandlerList != null ? eventHandlerList : new BasicEventHandlerList();
@@ -84,7 +87,41 @@ public class EventExecutor {
             return;
         }
         eventHandlerMethod.forEach(method -> {
-            EventHandler handler = eventHandlerObjectMap.getHandlerObject(method.getDeclaringClass());
+            final Set<EventHandler> handlerSet = eventHandlerObjectMap.getHandlerObject(method.getDeclaringClass());
+            threadPoolExecutor.execute(() -> handlerSet.forEach(handler -> {
+                try {
+                    method.invoke(handler, eventObject);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e){
+                    throw new RuntimeException(e.getCause() == null ? e : e.getCause());
+                }
+            }));
+        });
+    }
+
+    /**
+     * 对指定{@link EventHandler}投递事件
+     * @param handler 要进行事件投递的EventHandler
+     * @param eventObject 事件对象
+     * @return 返回已处理事件方法数量
+     */
+    public int executor(EventHandler handler, EventObject eventObject){
+        Method[] methods = handler.getClass().getDeclaredMethods();
+        int invokeCount = 0;
+        for (Method method : methods) {
+            int modifiers = method.getModifiers();
+            if(!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)){
+                continue;
+            }
+            Class<?>[] types = method.getParameterTypes();
+            if(types.length != 1){
+                continue;
+            }
+            if(!eventObject.getClass().isAssignableFrom(types[0])){
+                continue;
+            }
+
             threadPoolExecutor.execute(() -> {
                 try {
                     method.invoke(handler, eventObject);
@@ -94,7 +131,9 @@ public class EventExecutor {
                     throw new RuntimeException(e.getCause() == null ? e : e.getCause());
                 }
             });
-        });
+            invokeCount++;
+        }
+        return invokeCount;
     }
 
     /**

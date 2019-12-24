@@ -1,5 +1,7 @@
 package net.lamgc.utils.event;
 
+import java.util.Set;
+
 /**
  * EventHandler对象存储Map.
  * 用于对EventHandler对象进行存储而无需重新实例化.
@@ -17,7 +19,7 @@ public interface EventHandlerObjectMap {
      * @param eventHandlerClass EventHandler的Class对象
      * @return 如果找到则返回EventHandler对象, 无则返回null
      */
-    EventHandler getHandlerObject(Class<?> eventHandlerClass);
+    Set<EventHandler> getHandlerObject(Class<?> eventHandlerClass);
 
     /**
      * 删除指定的{@link EventHandler}

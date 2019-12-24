@@ -1,18 +1,23 @@
 package net.lamgc.utils.event;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HashHandlerObjectMap implements EventHandlerObjectMap {
 
-    private final HashMap<Class<? extends EventHandler>, EventHandler> handlerMap = new HashMap<>();
+    private final HashMap<Class<? extends EventHandler>, HashSet<EventHandler>> handlerMap = new HashMap<>();
 
     @Override
     public void addHandlerObject(EventHandler eventHandler) {
-        handlerMap.put(eventHandler.getClass(), eventHandler);
+        if(!handlerMap.containsKey(eventHandler.getClass())){
+            handlerMap.put(eventHandler.getClass(), new HashSet<>());
+        }
+        handlerMap.get(eventHandler.getClass()).add(eventHandler);
     }
 
     @Override
-    public EventHandler getHandlerObject(Class<?> eventHandlerClass) {
+    public Set<EventHandler> getHandlerObject(Class<?> eventHandlerClass) {
         return handlerMap.get(eventHandlerClass);
     }
 
