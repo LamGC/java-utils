@@ -31,7 +31,7 @@ public class EventExecutorTest {
         executor.executor(new SimpleEventObject(1, "HelloWorld"));
         Thread.sleep(500L);
         System.out.println("OnlyHandlerTest-----");
-        executor.executor(handler2, new SimpleEventObject(1, "HelloWorld"));
+        System.out.println("Execute Count: " + executor.executor(handler2, new SimpleEventObject(1, "HelloWorld")));
         Thread.sleep(500L);
         executor.removeHandler(handler);
         System.out.println("deleted Handler");
