@@ -29,9 +29,8 @@ public class EventExecutorTest {
         executor.executor(new SimpleEventObject(1, "HelloWorld"));
         Thread.sleep(500L);
         executor.removeHandler(handler);
-        System.out.println("已删除Handler");
-        executor.executor(new SimpleEventObject(1, "HelloWorld"));
-        //executor.awaitEventExecutor(10L, TimeUnit.SECONDS);
+        System.out.println("deleted Handler");
+        executor.executor(new SimpleEventObject(2, "HelloWorld123"));
     }
 
 
