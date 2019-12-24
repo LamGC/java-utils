@@ -12,4 +12,8 @@ public class SimpleEventHandler implements EventHandler {
         System.out.println(this.toString() + "." + flag + " - [" + event.errorCode + "] " + event.msg);
     }
 
+    public void throwExceptionEvent(ExceptionThrowEvent event){
+        throw new RuntimeException(event.getException());
+    }
+
 }

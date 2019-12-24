@@ -38,6 +38,33 @@ public class EventExecutorTest {
         executor.executor(new SimpleEventObject(2, "HelloWorld123"));
     }
 
+    @Test
+    public void caughtExceptionTest() throws IllegalAccessException, InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        threadPoolExecutor.setRejectedExecutionHandler((r, executor) -> {
+            try {
+                executor.getQueue().put(r);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
 
+        executor.setEventUncaughtExceptionHandler((handler, handlerMethod, event, cause) -> {
+            System.out.println("Handler: " + handler.toString() + ", MethodName: " + handlerMethod.getName() +
+                    ", Event: " + event.getClass().getSimpleName() + " throw Exception: " + cause.getMessage());
+            cause.printStackTrace();
+        });
+
+        SimpleEventHandler handler = new SimpleEventHandler("handler1");
+        executor.addHandler(handler);
+        executor.executor(new ExceptionThrowEvent(new NullPointerException()));
+        Thread.sleep(1000L);
+    }
 
 }

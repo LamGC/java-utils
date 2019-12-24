@@ -22,6 +22,8 @@ public class EventExecutor {
 
     private Thread.UncaughtExceptionHandler exceptionHandler = null;
 
+    private EventUncaughtExceptionHandler eventExceptionHandler = null;
+
     /**
      * 构造一个EventExecutor.
      * @param threadPoolExecutor 事件线程池, 线程池将用于执行Handler中的EventMethod.
@@ -45,6 +47,15 @@ public class EventExecutor {
             Thread newThread = threadFactory.newThread(r);
             if(newThread.getUncaughtExceptionHandler() == newThread.getThreadGroup()){
                 newThread.setUncaughtExceptionHandler((t, e) -> {
+                    if(e instanceof EventInvokeException && eventExceptionHandler != null){
+                        EventInvokeException exception = (EventInvokeException) e;
+                        eventExceptionHandler.exceptionHandler(
+                                exception.getHandler(),
+                                exception.getHandlerMethod(),
+                                exception.getEventObject(),
+                                exception.getCause());
+                        return;
+                    }
                     if(this.exceptionHandler != null){
                         this.exceptionHandler.uncaughtException(t, e);
                     }
@@ -88,15 +99,7 @@ public class EventExecutor {
         }
         eventHandlerMethod.forEach(method -> {
             final Set<EventHandler> handlerSet = eventHandlerObjectMap.getHandlerObject(method.getDeclaringClass());
-            threadPoolExecutor.execute(() -> handlerSet.forEach(handler -> {
-                try {
-                    method.invoke(handler, eventObject);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e){
-                    throw new RuntimeException(e.getCause() == null ? e : e.getCause());
-                }
-            }));
+            threadPoolExecutor.execute(() -> handlerSet.forEach(handler -> executeEvent(handler, eventObject, method)));
         });
     }
 
@@ -122,18 +125,22 @@ public class EventExecutor {
                 continue;
             }
 
-            threadPoolExecutor.execute(() -> {
-                try {
-                    method.invoke(handler, eventObject);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e){
-                    throw new RuntimeException(e.getCause() == null ? e : e.getCause());
-                }
-            });
+            executeEvent(handler, eventObject, method);
             invokeCount++;
         }
         return invokeCount;
+    }
+
+    private void executeEvent(EventHandler handler, EventObject event, Method eventMethod){
+        threadPoolExecutor.execute(() -> {
+            try {
+                eventMethod.invoke(handler, event);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e){
+                throw new EventInvokeException(handler, eventMethod, event, e.getCause());
+            }
+        });
     }
 
     /**
@@ -149,8 +156,12 @@ public class EventExecutor {
 
     /**
      * 设置线程池异常处理类.
+     *
      * EventExecutor在内部经过处理,
      * 可以动态更改UncaughtExceptionHandler而不用担心设置后需要等线程重新建立后才生效.
+     * 注意: 如需捕获EventHandler方法抛出的异常请使用{@link #setEventUncaughtExceptionHandler(EventUncaughtExceptionHandler)},
+     * 设置捕获EventHandler抛出的异常, 因EventExecutor内部处理,
+     * UncaughtExceptionHandler无法捕获{@link InvocationTargetException}异常来获取事件方法抛出的异常.
      * @param handler 处理类对象
      */
     public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler){
@@ -186,6 +197,32 @@ public class EventExecutor {
             return null;
         }
     }
+
+    /**
+     * 设置事件异常捕获处理对象.
+     * 该对象能详细获得
+     * @param handler 事件异常捕获处理对象
+     */
+    public void setEventUncaughtExceptionHandler(EventUncaughtExceptionHandler handler){
+        this.eventExceptionHandler = handler;
+    }
+
+    /**
+     * 事件异常处理接口
+     */
+    @FunctionalInterface
+    public interface EventUncaughtExceptionHandler{
+
+        /**
+         * 当事件对象抛出异常时触发.
+         * @param handler 事件处理方法所在{@link EventHandler}
+         * @param handlerMethod 抛出异常的方法对象
+         * @param event 事件对象
+         * @param cause 异常对象
+         */
+        void exceptionHandler(EventHandler handler, Method handlerMethod, EventObject event, Throwable cause);
+    }
+
 
     @Override
     protected void finalize() {
