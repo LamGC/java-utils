@@ -143,7 +143,7 @@ public class EventExecutor {
      * @return 如果在设置时间内线程池任务执行完成并关闭返回true, 否则返回false.
      * @throws InterruptedException 当发生中断时抛出
      */
-    public boolean awaitEventExecutor(long timeout, TimeUnit unit) throws InterruptedException {
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         return threadPoolExecutor.awaitTermination(timeout, unit);
     }
 
