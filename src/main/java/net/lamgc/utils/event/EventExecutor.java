@@ -133,6 +133,12 @@ public class EventExecutor {
         return invokeCount;
     }
 
+    /**
+     * 对指定EventHandler的Method投递事件.
+     * @param handler 要投递事件的EventHandler对象
+     * @param event 事件对象
+     * @param eventMethod 事件方法
+     */
     private void executeEvent(EventHandler handler, EventObject event, Method eventMethod){
         threadPoolExecutor.execute(() -> {
             try {
