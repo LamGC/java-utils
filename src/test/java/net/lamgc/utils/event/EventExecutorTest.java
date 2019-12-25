@@ -2,13 +2,18 @@ package net.lamgc.utils.event;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class EventExecutorTest {
+
+    private final Logger log = LoggerFactory.getLogger(EventExecutorTest.class.getSimpleName());
 
     @Test
     public void executorTest() throws IllegalAccessException, InterruptedException {
@@ -25,19 +30,26 @@ public class EventExecutorTest {
                 throw new RuntimeException(e);
             }
         });
+        AtomicInteger invokeCount = new AtomicInteger();
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
         SimpleEventHandler handler = new SimpleEventHandler("handler1");
         SimpleEventHandler handler2 = new SimpleEventHandler("handler2");
         executor.addHandler(handler);
         executor.addHandler(handler2);
-        executor.executor(new SimpleEventObject(1, "HelloWorld"));
+        executor.executor(new SimpleEventObject(1, "HelloWorld", invokeCount));
         Thread.sleep(500L);
-        System.out.println("OnlyHandlerTest-----");
-        System.out.println("Execute Count: " + executor.executor(handler2, new SimpleEventObject(1, "HelloWorld")));
+        Assert.assertEquals(invokeCount.get(), 2);
+        invokeCount.set(0);
+        log.info("SingleHandlerTest-----");
+        log.info("Execute Count: {}", executor.executor(handler2, new SimpleEventObject(1, "HelloWorld", invokeCount)));
         Thread.sleep(500L);
+        Assert.assertEquals(invokeCount.get(), 1);
+        invokeCount.set(0);
         executor.removeHandler(handler);
-        System.out.println("deleted Handler");
-        executor.executor(new SimpleEventObject(2, "HelloWorld123"));
+        log.info("deleted Handler");
+        executor.executor(new SimpleEventObject(2, "HelloWorld123", invokeCount));
+        Thread.sleep(500L);
+        Assert.assertEquals(invokeCount.get(), 1);
     }
 
     @Test
@@ -59,12 +71,14 @@ public class EventExecutorTest {
 
         AtomicBoolean handlerException = new AtomicBoolean(false);
         executor.setEventUncaughtExceptionHandler((t, handler, handlerMethod, event, cause) -> {
-            System.out.println(
-                      "Thread: [" + t.getId() + "] " + t.getName() +
-                    ", Handler: " + handler.toString() +
-                    ", MethodName: " + handlerMethod.getName() +
-                    ", Event: " + event.getClass().getSimpleName() +
-                     " throw Exception: " + cause.getMessage());
+            log.info("Thread: [{}] {}, Handler: {}, MethodName: {}, Event: {} - throw Exception: {}",
+                    t.getId(),
+                    t.getName(),
+                    handler.toString(),
+                    handlerMethod.getName(),
+                    event.getClass().getSimpleName(),
+                    cause.getMessage()
+            );
             cause.printStackTrace();
             handlerException.set(true);
         });

@@ -10,6 +10,7 @@ public class SimpleEventHandler implements EventHandler {
 
     public void simpleEventHandler(SimpleEventObject event){
         System.out.println(this.toString() + "." + flag + " - [" + event.errorCode + "] " + event.msg);
+        event.invokeCount.incrementAndGet();
     }
 
     public void throwExceptionEvent(ExceptionThrowEvent event){
