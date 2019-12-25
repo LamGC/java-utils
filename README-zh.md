@@ -4,11 +4,11 @@
 ## 支持环境 ##
 >**提示:** 目前，该项目尚未完成兼容性测试，此兼容性数据仅供参考。   
 - Base:
-  - Java: 1.8.0或更高版本
+  - Java：1.8.0或更高版本
 - Encrypt:
-  - Java: 1.8.0_161或更高版本(或对Java安装JCE.policy以解除对AES256及以上的限制)
+  - Java：1.8.0_161或更高版本(或对Java安装JCE.policy以解除对AES256及以上的限制)
 - Event:
-  - Java: 1.8.0或更高版本
+  - Java：1.8.0或更高版本
 
 ## 介绍 ##
 ### 这个项目的用途？ ###
@@ -16,25 +16,52 @@
 
 ## 工具 ##
 ### base ###
-包路径: net.lamgc.utils.base  
-介绍: 存放着一些基础工具类.  
+包路径：`net.lamgc.utils.base`  
+介绍：存放着一些基础工具类.  
 
 - `ArgumentsProperties` - 用于解析参数列表以生成参数键值对, 可以快速的查找参数.
 
 ### encrypt ###
-包路径: net.lamgc.utils.encrypt  
-介绍: Encrypt Utils包含了AES加解密, RSA加解密和签名等与加密有关的工具类, 所有工具类均以Java自带加密套件为基础开发.  
+包路径：`net.lamgc.utils.encrypt`  
+介绍：Encrypt Utils包含了AES加解密, RSA加解密和签名等与加密有关的工具类, 所有工具类均以Java自带加密套件为基础开发.  
 
 - `AESEncrypt` - AES加解密相关类.
 - `DiffieHellmanEncrypt` - DiffieHellman密钥交换算法类.
+    - 共享密钥所支持的加密算法类型：
+        - AES
+        - RC2
+        - RC4
+        - Blowfish
+        - DES
+        - DES-EDE
+        - HmacMD5
+        - HmacSHA1
+        - HmacSHA256
+        - HmacSHA384
+        - HmacSHA512
 - `MessageDigestUtils` - 消息摘要算法工具类.
+    - 支持的消息摘要算法：
+        - MD2
+        - MD5
+        - SHA-1
+        - SHA-256
+        - SHA-384
+        - SHA-512
 - `RSAEncrypt` - RSA加解密工具类.
 - `RSAEncryptWithAES` - RSA联合AES的长数据加解密工具类.
 - `RSASign` - RSA签名工具类.
+    - 支持的签名算法：
+        - MD2
+        - MD5
+        - SHA-1
+        - SHA-224
+        - SHA-256
+        - SHA-384
+        - SHA-512
 
 ### event ###
-包路径: net.lamgc.utils.event
-介绍: Event Utils是一套简单, 泛用的事件系统, 可以快速的为项目添加灵活的事件功能, 该事件系统以Bukkit API为原型开发.  
+包路径：`net.lamgc.utils.event`
+介绍：Event Utils是一套简单, 泛用的事件系统, 可以快速的为项目添加灵活的事件功能, 该事件系统以Bukkit API为原型开发.  
 
 - `BasicEventHandlerList` - 内置的默认EventHandlerList.
 - `EventExecutor` - 事件执行器, 用于投递事件到事件方法中.
