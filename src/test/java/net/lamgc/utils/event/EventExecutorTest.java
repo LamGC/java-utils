@@ -1,10 +1,12 @@
 package net.lamgc.utils.event;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EventExecutorTest {
 
@@ -55,16 +57,23 @@ public class EventExecutorTest {
         });
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
 
-        executor.setEventUncaughtExceptionHandler((handler, handlerMethod, event, cause) -> {
-            System.out.println("Handler: " + handler.toString() + ", MethodName: " + handlerMethod.getName() +
-                    ", Event: " + event.getClass().getSimpleName() + " throw Exception: " + cause.getMessage());
+        AtomicBoolean handlerException = new AtomicBoolean(false);
+        executor.setEventUncaughtExceptionHandler((t, handler, handlerMethod, event, cause) -> {
+            System.out.println(
+                      "Thread: [" + t.getId() + "] " + t.getName() +
+                    ", Handler: " + handler.toString() +
+                    ", MethodName: " + handlerMethod.getName() +
+                    ", Event: " + event.getClass().getSimpleName() +
+                     " throw Exception: " + cause.getMessage());
             cause.printStackTrace();
+            handlerException.set(true);
         });
 
         SimpleEventHandler handler = new SimpleEventHandler("handler1");
         executor.addHandler(handler);
         executor.executor(new ExceptionThrowEvent(new NullPointerException()));
         Thread.sleep(1000L);
+        Assert.assertTrue(handlerException.get());
     }
 
 }
