@@ -2,7 +2,7 @@ package net.lamgc.utils.event;
 
 import java.lang.reflect.Method;
 
-public class EventInvokeException extends RuntimeException {
+class EventInvokeException extends RuntimeException {
 
     private EventHandler handler;
 
