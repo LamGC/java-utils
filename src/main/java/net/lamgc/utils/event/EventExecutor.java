@@ -84,8 +84,9 @@ public class EventExecutor {
      * @param handler 要删除的EventHandler对象
      */
     public void removeHandler(EventHandler handler){
-        eventHandlerObjectMap.removeHandlerObject(handler);
-        eventHandlerList.removeEventHandler(handler);
+        if(!eventHandlerObjectMap.removeHandlerObject(handler)){
+            eventHandlerList.removeEventHandler(handler);
+        }
     }
 
     /**

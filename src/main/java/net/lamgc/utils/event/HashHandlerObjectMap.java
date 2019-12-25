@@ -22,7 +22,9 @@ public class HashHandlerObjectMap implements EventHandlerObjectMap {
     }
 
     @Override
-    public void removeHandlerObject(EventHandler handler) {
-        handlerMap.remove(handler.getClass());
+    public boolean removeHandlerObject(EventHandler handler) {
+        HashSet<EventHandler> eventHandlers = handlerMap.get(handler.getClass());
+        eventHandlers.remove(handler);
+        return !eventHandlers.isEmpty();
     }
 }

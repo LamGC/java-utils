@@ -24,7 +24,8 @@ public interface EventHandlerObjectMap {
     /**
      * 删除指定的{@link EventHandler}
      * @param handler 要删除的Handler
+     * @return 如果删除后该EventHandler已空则返回false
      */
-    void removeHandlerObject(EventHandler handler);
+    boolean removeHandlerObject(EventHandler handler);
 
 }
