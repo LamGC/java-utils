@@ -17,6 +17,8 @@ public class ArgumentsProperties extends HashMap<String, String>{
 
     private String[] keyFlags;
 
+    private String[] rawArguments;
+
     private ArrayList<String> keyList = new ArrayList<>();
 
     /**
@@ -66,7 +68,8 @@ public class ArgumentsProperties extends HashMap<String, String>{
      * 将参数数组加载进行处理
      * @param args 参数数组
      */
-    public void load(String[] args){
+    public void load(final String[] args){
+        rawArguments = args;
         String lastKey = null;
         for(String arg : args){
             String cacheKey = getKeyFilterFlag(arg);
@@ -167,4 +170,11 @@ public class ArgumentsProperties extends HashMap<String, String>{
         return super.keySet();
     }
 
+    /**
+     * 获取最后一次调用{@link #load(String[])}时提供的原始参数数组
+     * @return 最后一次加载的原始参数数组
+     */
+    public String[] getRawArguments() {
+        return rawArguments;
+    }
 }
