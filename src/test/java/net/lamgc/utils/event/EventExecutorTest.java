@@ -53,6 +53,32 @@ public class EventExecutorTest {
     }
 
     @Test
+    public void syncExecuteTest() throws IllegalAccessException, InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        threadPoolExecutor.setRejectedExecutionHandler((r, executor) -> {
+            try {
+                executor.getQueue().put(r);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        AtomicInteger invokeCount = new AtomicInteger();
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        for (int i = 0; i < 100; i++) {
+            executor.addHandler(new SimpleEventHandler("handler" + i));
+        }
+        log.info("[{}] execute event", System.currentTimeMillis());
+        executor.executorSync(new SimpleEventObject(1, "HelloWorld", invokeCount));
+        log.info("[{}] done", System.currentTimeMillis());
+    }
+
+
+    @Test
     public void caughtExceptionTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,

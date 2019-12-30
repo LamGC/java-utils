@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 事件执行器.
@@ -101,9 +102,35 @@ public class EventExecutor {
         }
         eventHandlerMethod.forEach(method -> {
             final Set<EventHandler> handlerSet = eventHandlerObjectMap.getHandlerObject(method.getDeclaringClass());
-            threadPoolExecutor.execute(() -> handlerSet.forEach(handler -> executeEvent(handler, eventObject, method)));
+            threadPoolExecutor.execute(() ->
+                    handlerSet.forEach(handler -> executeEvent(handler, eventObject, method, null)));
         });
     }
+
+    /**
+     * 同步投递事件.
+     * 方法将会在事件执行结束后返回.
+     * @param eventObject 需投递的事件对象
+     */
+    public void executorSync(final EventObject eventObject) throws InterruptedException {
+        Set<Method> eventHandlerMethod = eventHandlerList.getEventHandlerMethod(eventObject.getClass());
+        if(eventHandlerMethod == null){
+            return;
+        }
+
+        final AtomicInteger executeCount = new AtomicInteger();
+
+        eventHandlerMethod.forEach(method -> {
+            final Set<EventHandler> handlerSet = eventHandlerObjectMap.getHandlerObject(method.getDeclaringClass());
+            handlerSet.forEach(handler -> executeEvent(handler, eventObject, method, executeCount));
+        });
+        if(executeCount.get() != 0){
+            synchronized (executeCount) {
+                executeCount.wait();
+            }
+        }
+    }
+
 
     /**
      * 对指定{@link EventHandler}投递事件
@@ -127,7 +154,7 @@ public class EventExecutor {
                 continue;
             }
 
-            executeEvent(handler, eventObject, method);
+            executeEvent(handler, eventObject, method, null);
             invokeCount++;
         }
         return invokeCount;
@@ -138,9 +165,39 @@ public class EventExecutor {
      * @param handler 要投递事件的EventHandler对象
      * @param event 事件对象
      * @param eventMethod 事件方法
+     * @param executeCount 当需要进行执行计次时使用
      */
-    private void executeEvent(EventHandler handler, EventObject event, Method eventMethod){
-        threadPoolExecutor.execute(() -> {
+    private void executeEvent(final EventHandler handler,
+                              final EventObject event,
+                              final Method eventMethod,
+                              final AtomicInteger executeCount){
+        if(executeCount == null){
+            threadPoolExecutor.execute(createEventTask(handler, event, eventMethod));
+        } else {
+            int num = executeCount.incrementAndGet();
+            threadPoolExecutor.execute(() -> {
+                try {
+                    createEventTask(handler, event, eventMethod).run();
+                } finally {
+                    int num2 = executeCount.decrementAndGet();
+                    if (num2 == 0) {
+                        synchronized (executeCount) {
+                            executeCount.notifyAll();
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 创建事件任务
+     * @param handler 要投递事件的EventHandler对象
+     * @param event 事件对象
+     * @param eventMethod 事件方法
+     */
+    private Runnable createEventTask(EventHandler handler, EventObject event, Method eventMethod){
+        return () -> {
             try {
                 eventMethod.invoke(handler, event);
             } catch (IllegalAccessException e) {
@@ -148,7 +205,7 @@ public class EventExecutor {
             } catch (InvocationTargetException e){
                 throw new EventInvokeException(handler, eventMethod, event, e.getCause());
             }
-        });
+        };
     }
 
     /**
