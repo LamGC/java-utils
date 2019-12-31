@@ -10,6 +10,11 @@ English | [Chinese](README-zh.md)
 - Event:
   - Java: 1.8.0 or Upper
 
+## Update Logs ##
+> Tips: each version has its own tag.
+- `1.0.0` - 2019/12/25
+    - In the first stable version, some tool classes are added (see Readme - [Utils](#utils) section for details)
+
 ## Introduction ##
 ### The purpose of this project ###
 The purpose of this project is to summarize all the frequently used in Java development in one library, to avoid the situation of "the same function has been developed many times in different projects".
@@ -23,7 +28,7 @@ Introduction: Basic tools.
 
 ### encrypt ###
 Package path: `net.lamgc.utils.encrypt`  
-Introduction: Encrypt Utilscontains encryption-related tools such as AES encryption and decryption, RSA encryption and decryption, and signatures. All tool classes are developed based on Java's own encryption suite.  
+Introduction: Encrypt Utils contains encryption-related tools such as AES encryption and decryption, RSA encryption and decryption, and signatures. All tool classes are developed based on Java's own encryption suite.  
 
 - `AESEncrypt` - AES encryption and decryption related classes.
 - `DiffieHellmanEncrypt` - DiffieHellman Key exchange algorithm class.
