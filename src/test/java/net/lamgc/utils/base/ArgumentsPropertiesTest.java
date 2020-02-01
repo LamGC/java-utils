@@ -1,6 +1,5 @@
 package net.lamgc.utils.base;
 
-import net.lamgc.utils.base.ArgumentsProperties;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
