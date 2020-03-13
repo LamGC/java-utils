@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 事件执行器.
@@ -21,9 +22,9 @@ public class EventExecutor {
 
     private final ThreadPoolExecutor threadPoolExecutor;
 
-    private Thread.UncaughtExceptionHandler exceptionHandler = null;
+    private final AtomicReference<Thread.UncaughtExceptionHandler> exceptionHandler = new AtomicReference<>();
 
-    private EventUncaughtExceptionHandler eventExceptionHandler = null;
+    private final AtomicReference<EventUncaughtExceptionHandler> eventExceptionHandler = new AtomicReference<>();
 
     /**
      * 构造一个EventExecutor.
@@ -48,9 +49,10 @@ public class EventExecutor {
             Thread newThread = threadFactory.newThread(r);
             if(newThread.getUncaughtExceptionHandler() == newThread.getThreadGroup()){
                 newThread.setUncaughtExceptionHandler((t, e) -> {
-                    if(e instanceof EventInvokeException && eventExceptionHandler != null){
+                    EventUncaughtExceptionHandler eventUncaughtHandler;
+                    if(e instanceof EventInvokeException && (eventUncaughtHandler = eventExceptionHandler.get()) != null){
                         EventInvokeException exception = (EventInvokeException) e;
-                        eventExceptionHandler.exceptionHandler(
+                        eventUncaughtHandler.exceptionHandler(
                                 /* Thread: */ t,
                                 exception.getHandler(),
                                 exception.getHandlerMethod(),
@@ -58,8 +60,9 @@ public class EventExecutor {
                                 exception.getCause());
                         return;
                     }
-                    if(this.exceptionHandler != null){
-                        this.exceptionHandler.uncaughtException(t, e);
+                    Thread.UncaughtExceptionHandler threadExceptionHandler;
+                    if((threadExceptionHandler = this.exceptionHandler.get()) != null){
+                        threadExceptionHandler.uncaughtException(t, e);
                     }
                 });
             }
@@ -174,13 +177,13 @@ public class EventExecutor {
         if(executeCount == null){
             threadPoolExecutor.execute(createEventTask(handler, event, eventMethod));
         } else {
-            int num = executeCount.incrementAndGet();
+            executeCount.incrementAndGet();
             threadPoolExecutor.execute(() -> {
                 try {
                     createEventTask(handler, event, eventMethod).run();
                 } finally {
-                    int num2 = executeCount.decrementAndGet();
-                    if (num2 == 0) {
+                    int count = executeCount.decrementAndGet();
+                    if (count == 0) {
                         synchronized (executeCount) {
                             executeCount.notifyAll();
                         }
@@ -230,7 +233,7 @@ public class EventExecutor {
      * @param handler 处理类对象
      */
     public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler){
-        this.exceptionHandler = handler;
+        this.exceptionHandler.set(handler);
     }
 
     /**
@@ -246,7 +249,7 @@ public class EventExecutor {
      * @return 返回设置的UncaughtExceptionHandler, 如无设置则返回null
      */
     public Thread.UncaughtExceptionHandler getExceptionHandler(){
-        return this.exceptionHandler;
+        return this.exceptionHandler.get();
     }
 
     /**
@@ -269,7 +272,7 @@ public class EventExecutor {
      * @param handler 事件异常捕获处理对象
      */
     public void setEventUncaughtExceptionHandler(EventUncaughtExceptionHandler handler){
-        this.eventExceptionHandler = handler;
+        this.eventExceptionHandler.set(handler);
     }
 
     @Override
