@@ -207,6 +207,12 @@ public class ArgumentsRunner {
                 continue;
             }
 
+            if(!Modifier.isPublic(modifiers)) {
+                throw new IllegalModifierException("Method is not public: " + method.getName());
+            } else if (Modifier.isAbstract(modifiers)) {
+                throw new IllegalModifierException("Method is abstract: " + method.getName());
+            }
+
             String commandName = commandAnnotation.commandName();
             if(Strings.isNullOrEmpty(commandName)) {
                 commandName = method.getName();
