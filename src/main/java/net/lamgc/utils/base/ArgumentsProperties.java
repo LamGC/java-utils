@@ -107,7 +107,7 @@ public class ArgumentsProperties extends HashMap<String, String>{
      */
     private String getValueFromKey(String s){
         int index;
-        if((index = s.indexOf(":")) == -1){
+        if((index = s.indexOf(":")) == -1 && (index = s.indexOf("=")) == -1){
             return null;
         }
         return s.substring(index + 1).trim();
@@ -132,16 +132,17 @@ public class ArgumentsProperties extends HashMap<String, String>{
 
         int valueFlag = s.indexOf(":");
         if(valueFlag == -1){
-            return s.replace(keyFlags[flagIndex], "").trim();
-        }else{
-            return s.substring(keyFlags[flagIndex].length(), valueFlag).trim();
+            if((valueFlag = s.indexOf("=")) == -1) {
+                return s.replace(keyFlags[flagIndex], "").trim();
+            }
         }
-
+        return s.substring(keyFlags[flagIndex].length(), valueFlag).trim();
     }
 
 
     /**
-     * 获取指定参数的值
+     * 获取指定参数的值.<br/>
+     * 当参数存在, 但没有赋值时, 方法将返回空字符串而非null.<br/>
      * @param key 要获取值的参数名
      * @return 如果输入的参数中有指定的参数, 则返回非null(即使没有值), 如果该参数不存在, 返回null
      */
