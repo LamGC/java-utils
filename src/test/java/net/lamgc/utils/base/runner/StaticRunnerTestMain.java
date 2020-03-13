@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-public class RunnerTestMain {
+public class StaticRunnerTestMain {
 
     private final static Logger log = LoggerFactory.getLogger("RunnerMain");
 

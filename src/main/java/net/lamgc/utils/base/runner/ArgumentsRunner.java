@@ -11,7 +11,9 @@ import java.util.regex.Pattern;
 
 public class ArgumentsRunner {
 
+    private final Class<?> runClass;
     private CommandMap commandMap;
+
 
     /**
      * 无配置启动一个运行器
@@ -22,8 +24,22 @@ public class ArgumentsRunner {
      *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
-    public static Object run(Class<?> runClass, String[] args) throws RunnerException {
-        return new ArgumentsRunner(runClass).run(args);
+    public static Object run(Class<?> runClass, String[] args) {
+        return run(runClass, null, args);
+    }
+
+    /**
+     * 无配置启动一个运行器
+     * @param runClass 待运行的Class对象
+     * @param object class的实例对象
+     * @param args 运行参数
+     * @return 返回命令处理方法的返回值.
+     * @throws RunnerException 当运行器发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
+     */
+    public static Object run(Class<?> runClass, Object object, String[] args) throws RunnerException {
+        return new ArgumentsRunner(runClass).run(object, args);
     }
 
     /**
@@ -35,13 +51,31 @@ public class ArgumentsRunner {
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public static Object runInThisClass(String[] args) throws RunnerException {
+        return runInThisClass(null, args);
+    }
+
+    /**
+     * 在调用该方法所在类启动ArgumentsRunner
+     * @param object 当前方法所在的class的实例对象
+     * @param args 参数
+     * @return 返回命令处理方法的返回值.
+     * @throws RunnerException 当运行器发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
+     */
+    public static Object runInThisClass(Object object, String[] args) throws RunnerException {
         try {
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
             if(stackTraceElements.length < 3) {
                 throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, new IllegalStateException("Stack error"));
             }
-            Class<?> targetClass = ClassLoader.getSystemClassLoader().loadClass(stackTraceElements[2].getClassName());
-            return ArgumentsRunner.run(targetClass, args);
+            int callerElementIndex = 2;
+            StackTraceElement caller = stackTraceElements[callerElementIndex];
+            while (caller.getClassName().equals(stackTraceElements[1].getClassName()) && caller.getMethodName().equals(stackTraceElements[1].getMethodName())) {
+                caller = stackTraceElements[++callerElementIndex];
+            }
+            Class<?> targetClass = ClassLoader.getSystemClassLoader().loadClass(caller.getClassName());
+            return ArgumentsRunner.run(targetClass, object, args);
         } catch (ClassNotFoundException e) {
             throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, e);
         }
@@ -55,11 +89,12 @@ public class ArgumentsRunner {
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public ArgumentsRunner(Class<?> runClass) throws RunnerException {
+        this.runClass = runClass;
         commandMap = parseCommandMethodFromClass(runClass);
     }
 
     /**
-     * 启动运行器
+     * 无实例对象启动运行器
      * @param args 运行参数
      * @return 返回命令处理方法的返回值.
      * @throws RunnerException 当运行器发生异常时抛出,
@@ -67,6 +102,23 @@ public class ArgumentsRunner {
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public Object run(String[] args) throws RunnerException {
+        return run(null, args);
+    }
+
+    /**
+     * 启动运行器
+     * @param object 构造时提供的class所属的实例对象
+     * @param args 运行参数
+     * @return 返回命令处理方法的返回值.
+     * @throws RunnerException 当运行器发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
+     */
+    public Object run(Object object, String[] args) throws RunnerException {
+        if(object != null && !runClass.isInstance(object)) {
+            throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, "The provided object is not an instance of runClass");
+        }
+
         Method targetMethod;
         if(Objects.requireNonNull(args).length == 0) {
             if(!commandMap.hasDefaultMethod()) {
@@ -75,7 +127,7 @@ public class ArgumentsRunner {
                 targetMethod = commandMap.getDefaultMethod();
             }
         } else {
-            String command = args[0];
+            String command = object == null ? "Static." + args[0] : args[0];
             if (!commandMap.containsKey(command)) {
                 throw new NoSuchCommandException(command);
             }
@@ -91,7 +143,7 @@ public class ArgumentsRunner {
         String[] arguments = args.length <= 1 ? new String[0] : Arrays.copyOfRange(args, 1, args.length);
         List<Object> paramList = generateParamListByFlag(targetMethod, arguments);
         try {
-            return targetMethod.invoke(null, paramList.toArray(new Object[0]));
+            return targetMethod.invoke(object, paramList.toArray(new Object[0]));
         } catch (IllegalAccessException e) {
             throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, e);
         } catch (InvocationTargetException e) {
@@ -108,7 +160,6 @@ public class ArgumentsRunner {
      */
     private List<Object> generateParamListByFlag(Method method, String[] args) {
         ArgumentsProperties argsProp = new ArgumentsProperties(args);
-        //AnnotatedType[] parameterTypes = method.getAnnotatedParameterTypes();
         Parameter[] parameterTypes = method.getParameters();
         ArrayList<Object> paramList = new ArrayList<>(parameterTypes.length);
         int paramIndex = -1;
@@ -196,9 +247,10 @@ public class ArgumentsRunner {
         Pattern flagCheckPattern = Pattern.compile("^[A-Za-z_$]+[A-Za-z0-9_\\-$]+$");
         for(Method method : methods) {
             int modifiers = method.getModifiers();
-            if(!Modifier.isStatic(modifiers)) {
+            /*if(!Modifier.isStatic(modifiers)) {
                 continue;
-            } else if(isMainMethod(method)) {
+            } else */
+            if(isMainMethod(method)) {
                 continue;
             }
 
@@ -235,8 +287,9 @@ public class ArgumentsRunner {
                 throw new IllegalCommandException("Illegal command name: " + commandName);
             }
 
+            // 不存在默认方法, 注解标记了默认方法, 参数列表为空, 方法是静态方法
             if(!commandMethodMap.hasDefaultMethod() && commandAnnotation.defaultCommand() &&
-                    method.getAnnotatedParameterTypes().length == 0
+                    method.getAnnotatedParameterTypes().length == 0 && Modifier.isStatic(modifiers)
             ) {
                 commandMethodMap.setDefaultMethod(method);
             }
@@ -246,7 +299,7 @@ public class ArgumentsRunner {
                 throw new IllegalCommandException("Multiple command names exist in the same method: " + commandName);
             }
 
-            commandMethodMap.put(commandName, method);
+            commandMethodMap.put(Modifier.isStatic(modifiers) ? "Static." + commandName : commandName, method);
         }
 
         return commandMethodMap;
