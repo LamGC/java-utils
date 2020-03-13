@@ -10,6 +10,10 @@ public class RunnerTestMain {
 
     private final static Logger log = LoggerFactory.getLogger("RunnerMain");
 
+    public static void main(String[] args) {
+        ArgumentsRunner.runInThisClass(args);
+    }
+
     @Command(commandName = "help", defaultCommand = true)
     public static Boolean noParameterDefaultCommand() {
         System.out.println("Usage: java -jar jarFile <Command> [Arguments...]");

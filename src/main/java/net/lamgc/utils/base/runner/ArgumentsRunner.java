@@ -13,17 +13,58 @@ public class ArgumentsRunner {
 
     private CommandMap commandMap;
 
+    /**
+     * 无配置启动一个运行器
+     * @param runClass 待运行的Class对象
+     * @param args 运行参数
+     * @return 返回命令处理方法的返回值.
+     * @throws RunnerException 当运行器发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
+     */
     public static Object run(Class<?> runClass, String[] args) throws RunnerException {
         return new ArgumentsRunner(runClass).run(args);
     }
 
+    /**
+     * 在调用该方法所在类启动ArgumentsRunner
+     * @param args 参数
+     * @return 返回命令处理方法的返回值.
+     * @throws RunnerException 当运行器发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
+     */
+    public static Object runInThisClass(String[] args) throws RunnerException {
+        try {
+            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+            if(stackTraceElements.length < 3) {
+                throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, new IllegalStateException("Stack error"));
+            }
+            Class<?> targetClass = ClassLoader.getSystemClassLoader().loadClass(stackTraceElements[2].getClassName());
+            return ArgumentsRunner.run(targetClass, args);
+        } catch (ClassNotFoundException e) {
+            throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, e);
+        }
+    }
+
+    /**
+     * 构造一个参数运行器
+     * @param runClass 运行类对象
+     * @throws RunnerException 当检查Class发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
+     */
     public ArgumentsRunner(Class<?> runClass) throws RunnerException {
         commandMap = parseCommandMethodFromClass(runClass);
     }
 
     /**
-     * 启用运行
-     * @param args 运行参数 <pre> &lt;Command&gt;[Arguments...]</pre>
+     * 启动运行器
+     * @param args 运行参数
+     * @return 返回命令处理方法的返回值.
+     * @throws RunnerException 当运行器发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public Object run(String[] args) throws RunnerException {
         Method targetMethod;
@@ -136,7 +177,12 @@ public class ArgumentsRunner {
         return paramList;
     }
 
-
+    /**
+     * 从指定class解析并获取命令处理方法
+     * @param clazz 待解析的class对象
+     * @return 存放命令与方法对应关系的Map
+     * @throws RunnerException 当解析出异常时抛出
+     */
     public static CommandMap parseCommandMethodFromClass(Class<?> clazz) throws RunnerException {
         int classModifier = clazz.getModifiers();
         if(!Modifier.isPublic(classModifier)) {

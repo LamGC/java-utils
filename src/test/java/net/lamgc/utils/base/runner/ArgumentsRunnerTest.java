@@ -37,4 +37,9 @@ public class ArgumentsRunnerTest {
         ArgumentsRunner.run(RunnerTestMain.class, ("printTime --timeStamp " + (new Date().getTime() * 1000)).split(" "));
     }
 
+    @Test
+    public void runInThisClassTest() {
+        RunnerTestMain.main(new String[0]);
+    }
+
 }
