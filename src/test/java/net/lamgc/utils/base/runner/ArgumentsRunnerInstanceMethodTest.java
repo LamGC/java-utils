@@ -12,7 +12,7 @@ public class ArgumentsRunnerInstanceMethodTest {
     
     @Test
     public void normalOperationTest() {
-        ArgumentsRunner.run(InstanceRunnerTestMain.class, testMain,  ("test-01 -propName test --length:5 /port=8080 -percentage 0.55 -bool -pi 3.1415926535898").split(" "));
+        ArgumentsRunner.run(InstanceRunnerTestMain.class, testMain,  ("test-01 -propName test --length:5 /port=8080 -percentage 0.55 -bool -pi 3.1415926535898 -bool2=true").split(" "));
     }
 
     @Test

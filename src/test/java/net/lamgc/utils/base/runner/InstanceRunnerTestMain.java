@@ -30,9 +30,10 @@ public class InstanceRunnerTestMain {
             @Argument(name = "port") short port,
             @Argument(name = "percentage", force = false, defaultValue = "0.0") float percentage,
             @Argument(name = "bool") boolean bool,
-            @Argument(name = "pi", force = false, defaultValue = "3.1415926") double pi
+            @Argument(name = "pi", force = false, defaultValue = "3.1415926") double pi,
+            @Argument(name = "bool2") boolean bool2
     ) {
-        log.info("PropName: {}, Length: {}, port: {}, percentage: {}, bool: {}, pi: {}", propName, length, port, percentage, bool, pi);
+        log.info("PropName: {}, Length: {}, port: {}, percentage: {}, bool: {}, pi: {}, bool2: {}", propName, length, port, percentage, bool, pi, bool2);
     }
 
     @Command(commandName = "printTime")
