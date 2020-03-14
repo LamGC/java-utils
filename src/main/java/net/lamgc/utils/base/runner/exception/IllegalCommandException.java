@@ -1,7 +1,7 @@
 package net.lamgc.utils.base.runner.exception;
 
-public class IllegalCommandException extends RunnerException {
+public class IllegalCommandException extends DeveloperRunnerException {
     public IllegalCommandException(String message) {
-        super(TRIGGER_DEVELOPER, message);
+        super(message);
     }
 }

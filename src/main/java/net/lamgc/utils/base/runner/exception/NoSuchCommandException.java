@@ -1,7 +1,7 @@
 package net.lamgc.utils.base.runner.exception;
 
-public class NoSuchCommandException extends RunnerException {
+public class NoSuchCommandException extends UserRunnerException {
     public NoSuchCommandException(String commandName) {
-        super(TRIGGER_USER, "No method found for command: " + commandName);
+        super("No method found for command: " + commandName);
     }
 }
