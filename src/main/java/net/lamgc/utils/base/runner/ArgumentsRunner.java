@@ -125,7 +125,8 @@ public class ArgumentsRunner {
      */
     public Object run(Object object, String[] args) throws RunnerException {
         if(object != null && !runClass.isInstance(object)) {
-            throw new DeveloperRunnerException("The provided object is not an instance of runClass");
+            throw new DeveloperRunnerException(
+                    new IllegalArgumentException("The provided object is not an instance of runClass"));
         }
 
         Method targetMethod;
@@ -154,10 +155,8 @@ public class ArgumentsRunner {
         List<Object> paramList = generateParamListByFlag(targetMethod, arguments);
         try {
             return targetMethod.invoke(object, paramList.toArray(new Object[0]));
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new DeveloperRunnerException(e);
-        } catch (InvocationTargetException e) {
-            throw new DeveloperRunnerException(e.getTargetException());
         }
 
     }
