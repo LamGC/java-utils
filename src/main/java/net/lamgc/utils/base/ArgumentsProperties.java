@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ArgumentsProperties extends HashMap<String, String>{
 
     private static final long serialVersionUID = 3008463812837214134L;
-    
+
     private static transient final String[] defaultKeyFlags = new String[] {
         "--",
         "-",
@@ -63,6 +65,20 @@ public class ArgumentsProperties extends HashMap<String, String>{
         /key:value
         多个值需要使用:(windows) ;(linux) (自动识别)(以第一个为准)
     */
+
+    /**
+     * 将参数加载进行处理
+     * @param argument 参数文本
+     */
+    public void load(String argument) {
+        Pattern pattern = Pattern.compile("/\\s*(\".+?\"|[^:\\s])+((\\s*:\\s*(\".+?\"|[^\\s])+)|)|(\".+?\"|[^\"\\s])+");
+        Matcher matcher = pattern.matcher(argument);
+        ArrayList<String> argsList = new ArrayList<>();
+        while (matcher.find()) {
+            argsList.add(matcher.group());
+        }
+        load(argsList.toArray(new String[0]));
+    }
 
     /**
      * 将参数数组加载进行处理
