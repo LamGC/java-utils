@@ -1,5 +1,11 @@
 package net.lamgc.utils.base.runner.exception;
 
+/**
+ * 运行器异常类, 所有与运行器相关异常的父类.
+ * 捕获RunnerException可接收所有运行器抛出的异常, 但不推荐这么做,
+ * 由于异常引发者分为 开发者 和 用户, 所以你应该分别捕获{@link UserRunnerException} 和 {@link DeveloperRunnerException}
+ * 来分别处理两者引发的异常.
+ */
 public class RunnerException extends RuntimeException {
 
     /**
