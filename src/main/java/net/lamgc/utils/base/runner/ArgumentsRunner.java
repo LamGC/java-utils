@@ -76,7 +76,7 @@ public class ArgumentsRunner {
         try {
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
             if(stackTraceElements.length < 3) {
-                throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, new IllegalStateException("Stack error"));
+                throw new DeveloperRunnerException(new IllegalStateException("Stack error"));
             }
             int callerElementIndex = 2;
             StackTraceElement caller = stackTraceElements[callerElementIndex];
@@ -86,7 +86,7 @@ public class ArgumentsRunner {
             Class<?> targetClass = ClassLoader.getSystemClassLoader().loadClass(caller.getClassName());
             return ArgumentsRunner.run(targetClass, object, args);
         } catch (ClassNotFoundException e) {
-            throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, e);
+            throw new DeveloperRunnerException(e);
         }
     }
 
@@ -125,13 +125,13 @@ public class ArgumentsRunner {
      */
     public Object run(Object object, String[] args) throws RunnerException {
         if(object != null && !runClass.isInstance(object)) {
-            throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, "The provided object is not an instance of runClass");
+            throw new DeveloperRunnerException("The provided object is not an instance of runClass");
         }
 
         Method targetMethod;
         if(Objects.requireNonNull(args).length == 0) {
             if(!commandMap.hasDefaultMethod()) {
-                throw new RunnerException(RunnerException.TRIGGER_USER, "Arguments is empty");
+                throw new CommandNotSpecifiedException();
             } else {
                 targetMethod = commandMap.getDefaultMethod();
                 object = null;
@@ -155,9 +155,9 @@ public class ArgumentsRunner {
         try {
             return targetMethod.invoke(object, paramList.toArray(new Object[0]));
         } catch (IllegalAccessException e) {
-            throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, e);
+            throw new DeveloperRunnerException(e);
         } catch (InvocationTargetException e) {
-            throw new RunnerException(RunnerException.TRIGGER_DEVELOPER, e.getTargetException());
+            throw new DeveloperRunnerException(e.getTargetException());
         }
 
     }
