@@ -1,5 +1,6 @@
 package net.lamgc.utils.base.runner;
 
+import com.google.common.base.Defaults;
 import com.google.common.base.Strings;
 import net.lamgc.utils.base.ArgumentsProperties;
 import net.lamgc.utils.base.StringParser;
@@ -186,7 +187,7 @@ public class ArgumentsRunner {
             String typeName = paramType.getType().getTypeName();
 
             String paramValue;
-            if(argsProp.containsKey(paramName)) {
+            if(argsProp.containsKey(paramName) || !argumentAnnotation.force()) {
                 paramValue = argsProp.getValue(paramName);
             } else {
                 throw new ParameterNoFoundException(method.getName(), paramIndex, paramName);
@@ -198,7 +199,9 @@ public class ArgumentsRunner {
                     if (!Strings.isNullOrEmpty(defaultValue)) {
                         paramValue = defaultValue;
                     } else {
-                        throw new InvalidParameterException("Parameter force is false but has no default value. (Index: " + paramIndex + ")");
+                        paramList.add(Defaults.defaultValue(paramType.getType()));
+                        //TODO: 可以作为Config的一项存在，例如: 严格检查defaultValue
+                        //throw new InvalidParameterException("Parameter force is false but has no default value. (Index: " + paramIndex + ")");
                     }
                 } else if(typeName.toLowerCase().lastIndexOf("boolean") == -1) {
                     throw new ParameterNoFoundException(method.getName(), paramIndex, paramName);
@@ -234,7 +237,7 @@ public class ArgumentsRunner {
      * @return 存放命令与方法对应关系的Map
      * @throws RunnerException 当解析出异常时抛出
      */
-    public static CommandMap parseCommandMethodFromClass(Class<?> clazz) throws RunnerException {
+    private static CommandMap parseCommandMethodFromClass(Class<?> clazz) throws RunnerException {
         int classModifier = clazz.getModifiers();
         if(!Modifier.isPublic(classModifier)) {
             throw new IllegalModifierException("Class is not public");
@@ -247,9 +250,6 @@ public class ArgumentsRunner {
         Pattern flagCheckPattern = Pattern.compile("^[A-Za-z_$]+[A-Za-z0-9_\\-$]+$");
         for(Method method : methods) {
             int modifiers = method.getModifiers();
-            /*if(!Modifier.isStatic(modifiers)) {
-                continue;
-            } else */
             if(isMainMethod(method)) {
                 continue;
             }
@@ -270,19 +270,6 @@ public class ArgumentsRunner {
                 commandName = method.getName();
             }
 
-
-
-            // 检查命令是否合法
-                /*
-                需要检查的情况:
-                    空命令
-                    带空格的非法命令
-                    非法字符?
-                可行的方案:
-                    限制命令与Java标识符命名规范一致
-                        如果采用该方案，则Command命令连value都能不要, 直接方法名完事了
-                    (必选) 正则表达式检查命名
-                 */
             if (!flagCheckPattern.matcher(commandName).matches()) {
                 throw new IllegalCommandException("Illegal command name: " + commandName);
             }
