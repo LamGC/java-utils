@@ -10,6 +10,14 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * 命令行参数运行器.<br/>
+ * 该运行器根据传入的参数, 自动选择指定类中带有{@linkplain Command Command标注}的方法, 且支持参数传入.<br/>
+ * 运行格式:
+ * <pre>
+ *     java -jar jarFile <Command> [Arguments...]
+ * </pre>
+ */
 public class ArgumentsRunner {
 
     private final Class<?> runClass;
@@ -126,6 +134,7 @@ public class ArgumentsRunner {
                 throw new RunnerException(RunnerException.TRIGGER_USER, "Arguments is empty");
             } else {
                 targetMethod = commandMap.getDefaultMethod();
+                object = null;
             }
         } else {
             String command = object == null ? "Static." + args[0] : args[0];
@@ -274,7 +283,7 @@ public class ArgumentsRunner {
                 throw new IllegalCommandException("Illegal command name: " + commandName);
             }
 
-            // 不存在默认方法, 注解标记了默认方法, 参数列表为空, 方法是静态方法
+            // 设为默认方法需满足的条件: 该类中唯一的默认方法, 注解标记了defaultValue, 参数列表为空, 方法是静态方法
             if(!commandMethodMap.hasDefaultMethod() && commandAnnotation.defaultCommand() &&
                     method.getAnnotatedParameterTypes().length == 0 && Modifier.isStatic(modifiers)
             ) {
@@ -292,6 +301,11 @@ public class ArgumentsRunner {
         return commandMethodMap;
     }
 
+    /**
+     * 检查是否为主方法.
+     * @param method 待检查的方法.
+     * @return 如果返回true, 则方法为main主方法.
+     */
     private static boolean isMainMethod(Method method) {
         // public static void main(java.lang.String[])
         int modifier = method.getModifiers();
