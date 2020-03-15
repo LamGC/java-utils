@@ -111,7 +111,7 @@ public class ArgumentsRunner {
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public Object run(String[] args) throws RunnerException {
-        return run(null, args);
+        return run((Object) null, args);
     }
 
     /**
