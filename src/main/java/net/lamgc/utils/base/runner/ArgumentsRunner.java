@@ -140,9 +140,15 @@ public class ArgumentsRunner {
         } else {
             String command = object == null ? "Static." + args[0] : args[0];
             if (!commandMap.containsKey(command)) {
-                throw new NoSuchCommandException(command);
+                if(!commandMap.hasDefaultMethod()) {
+                    throw new NoSuchCommandException(command);
+                } else {
+                    targetMethod = commandMap.getDefaultMethod();
+                }
+            } else {
+                targetMethod = commandMap.get(command);
             }
-            targetMethod = commandMap.get(command);
+
             int modifiers = targetMethod.getModifiers();
             if(!Modifier.isPublic(modifiers)) {
                 throw new IllegalModifierException("Method is not public: " + targetMethod.getName());
@@ -153,8 +159,10 @@ public class ArgumentsRunner {
 
         String[] arguments = args.length <= 1 ? new String[0] : Arrays.copyOfRange(args, 1, args.length);
         List<Object> paramList = generateParamListByFlag(targetMethod, arguments);
+        Object[] params = new Object[targetMethod.getParameterTypes().length];
+        paramList.toArray(params);
         try {
-            return targetMethod.invoke(object, paramList.toArray(new Object[0]));
+            return targetMethod.invoke(object, params);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new DeveloperRunnerException(e);
         }
