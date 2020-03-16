@@ -38,4 +38,10 @@ public class ArgumentsRunnerStaticMethodTest {
         StaticRunnerTestMain.main(new String[0]);
     }
 
+    @Test
+    public void preParameterNullTest() {
+        ArgumentsRunner.run(InstanceRunnerTestMain.class,
+                "preParameterNullTest -nonNullParam1 test -nonNullParam2 test2 -nonNullParam3 test3".split(" "));
+    }
+
 }

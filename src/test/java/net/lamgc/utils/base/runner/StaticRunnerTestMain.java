@@ -48,4 +48,21 @@ public class StaticRunnerTestMain {
         Assert.fail();
     }
 
+    @Command
+    public void preParameterNullTest(
+            @Argument(name = "nullParam1", force = false) String arg1,
+            @Argument(name = "nonNullParam1", force = false) String arg2,
+            @Argument(name = "nullParam2", force = false) String arg3,
+            @Argument(name = "nonNullParam2", force = false) String arg4,
+            @Argument(name = "nonNullParam3", force = false) String arg5,
+            @Argument(name = "nullParam3", force = false) String arg6
+    ) {
+        Assert.assertNull("nullParam1" ,arg1);
+        Assert.assertNotNull("nonNullParam1", arg2);
+        Assert.assertNull("nullParam2" ,arg3);
+        Assert.assertNotNull("nonNullParam2", arg4);
+        Assert.assertNotNull("nonNullParam3", arg5);
+        Assert.assertNull("nullParam3" ,arg6);
+    }
+
 }

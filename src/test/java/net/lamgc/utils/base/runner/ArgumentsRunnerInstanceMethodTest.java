@@ -41,4 +41,10 @@ public class ArgumentsRunnerInstanceMethodTest {
         InstanceRunnerTestMain.main(new String[0]);
     }
 
+    @Test
+    public void preParameterNullTest() {
+        ArgumentsRunner.run(InstanceRunnerTestMain.class, testMain,
+                "preParameterNullTest -nonNullParam1 test -nonNullParam2 test2 -nonNullParam3 test3".split(" "));
+    }
+
 }

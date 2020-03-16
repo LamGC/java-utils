@@ -218,6 +218,7 @@ public class ArgumentsRunner {
                         paramList.add(Defaults.defaultValue(paramType.getType()));
                         //TODO: 可以作为Config的一项存在，例如: 严格检查defaultValue
                         //throw new InvalidParameterException("Parameter force is false but has no default value. (Index: " + paramIndex + ")");
+                        continue;
                     }
                 } else if(typeName.toLowerCase().lastIndexOf("boolean") == -1) {
                     throw new ParameterNoFoundException(method.getName(), paramIndex, paramName);
