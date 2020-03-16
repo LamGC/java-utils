@@ -34,7 +34,7 @@ public class ArgumentsRunner {
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public static Object run(Class<?> runClass, String[] args) {
-        return run(runClass, null, args);
+        return new ArgumentsRunner(runClass).run(args);
     }
 
     /**
