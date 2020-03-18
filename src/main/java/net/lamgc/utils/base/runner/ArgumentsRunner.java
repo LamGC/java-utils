@@ -23,7 +23,6 @@ public class ArgumentsRunner {
     private final Class<?> runClass;
     private CommandMap commandMap;
 
-
     /**
      * 无配置启动一个运行器
      * @param runClass 待运行的Class对象
@@ -170,12 +169,23 @@ public class ArgumentsRunner {
     }
 
     /**
+     * 获取已获得的命令名. <br/>
+     * 命令根据方法静态与否, 在命令名前有静态表示的 "Static." 前缀, <br/>
+     * 例如实例命令方法 "Command",
+     * 如果是静态方法, 则为 "Static.Command"
+     * @return 返回存储命令名的Set对象, 如尚未解析Class内的方法, 则返回null
+     */
+    public Set<String> getCommandNames() {
+        return commandMap == null ? null : new HashSet<>(commandMap.keySet());
+    }
+
+    /**
      * 构造参数列表
      * @param method 目标执行方法
      * @param args 字符串参数数组
      * @return 参数列表
      */
-    private List<Object> generateParamListByFlag(Method method, String[] args) {
+    private static List<Object> generateParamListByFlag(Method method, String[] args) {
         ArgumentsProperties argsProp = new ArgumentsProperties(args);
         Parameter[] parameterTypes = method.getParameters();
         ArrayList<Object> paramList = new ArrayList<>(parameterTypes.length);
@@ -266,7 +276,6 @@ public class ArgumentsRunner {
         CommandMap commandMethodMap = new CommandMap(methods.length);
         Pattern flagCheckPattern = Pattern.compile("^[A-Za-z_$]+[A-Za-z0-9_\\-$]+$");
         for(Method method : methods) {
-            int modifiers = method.getModifiers();
             if(isMainMethod(method)) {
                 continue;
             }
@@ -276,6 +285,7 @@ public class ArgumentsRunner {
                 continue;
             }
 
+            int modifiers = method.getModifiers();
             if(!Modifier.isPublic(modifiers)) {
                 throw new IllegalModifierException("Method is not public: " + method.getName());
             } else if (Modifier.isAbstract(modifiers)) {
@@ -331,7 +341,7 @@ public class ArgumentsRunner {
      * @param typeName 类型名称
      * @return 支持则返回true
      */
-    private boolean checkParametersType(String typeName){
+    private static boolean checkParametersType(String typeName){
         HashSet<String> typeSet = new HashSet<>(Arrays.asList(
                 "int","long","short","float","double","boolean",
 
