@@ -1,6 +1,7 @@
 package net.lamgc.utils.base.runner;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,9 +31,9 @@ class ArgumentsRunnerConfig implements Serializable {
     private Set<String> trueFlag = new HashSet<>(4);
 
     /**
-     *
+     * StringParameterParser存储对象
      */
-    private StringParameterParserMap parameterParserMap;
+    private StringParameterParserMap parameterParserMap = new StringParameterParserMap();
 
     public ArgumentsRunnerConfig() {
         initialConfig();
@@ -49,6 +50,32 @@ class ArgumentsRunnerConfig implements Serializable {
         trueFlag.add("yes");
 
 
+    }
+
+    /**
+     * 添加指定Type的Parser对象.<br/>
+     * 注意: 添加会导致原本的Parser被覆盖.
+     * @param parser Parser对象
+     */
+    public void addStringParameterParser(StringParameterParser<? extends Type> parser) {
+        this.parameterParserMap.addParser(parser);
+    }
+
+    /**
+     * 删除指定Type的Parser对象.<br/>
+     * @param type 欲删除Parser对象的Type.
+     */
+    public void removeStringParameterParser(Type type) {
+        this.parameterParserMap.removeParser(type);
+    }
+
+    /**
+     * 获取指定Type的Parser对象.
+     * @param type 欲获取的Parser对象所属的Type.
+     * @return 如果获取成功返回对象, 失败返回null.
+     */
+    public StringParameterParser<? extends Type> getStringParameterParser(Type type) {
+        return this.parameterParserMap.getParser(type);
     }
 
     /**
