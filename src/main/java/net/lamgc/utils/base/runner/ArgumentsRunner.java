@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
  */
 public class ArgumentsRunner {
 
+    private final ArgumentsRunnerConfig config;
+
     private final Class<?> runClass;
     private CommandMap commandMap;
 
@@ -33,7 +35,7 @@ public class ArgumentsRunner {
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public static Object run(Class<?> runClass, String[] args) {
-        return new ArgumentsRunner(runClass).run(args);
+        return new ArgumentsRunner(runClass, null).run(args);
     }
 
     /**
@@ -47,7 +49,7 @@ public class ArgumentsRunner {
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
     public static Object run(Class<?> runClass, Object object, String[] args) throws RunnerException {
-        return new ArgumentsRunner(runClass).run(object, args);
+        return new ArgumentsRunner(runClass, null).run(object, args);
     }
 
     /**
@@ -96,8 +98,9 @@ public class ArgumentsRunner {
      *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
      */
-    public ArgumentsRunner(Class<?> runClass) throws RunnerException {
+    public ArgumentsRunner(Class<?> runClass, ArgumentsRunnerConfig config) throws RunnerException {
         this.runClass = runClass;
+        this.config = config == null ? new ArgumentsRunnerConfig() : config;
         commandMap = parseCommandMethodFromClass(runClass);
     }
 
@@ -137,7 +140,12 @@ public class ArgumentsRunner {
                 object = null;
             }
         } else {
-            String command = object == null ? "Static." + args[0] : args[0];
+            String commandName = args[0];
+            if(config.isCommandIgnoreCase()) {
+                commandName = commandName.toLowerCase();
+            }
+
+            String command = object == null ? "Static." + commandName : commandName;
             if (!commandMap.containsKey(command)) {
                 if(!commandMap.hasDefaultMethod()) {
                     throw new NoSuchCommandException(command);
@@ -185,7 +193,7 @@ public class ArgumentsRunner {
      * @param args 字符串参数数组
      * @return 参数列表
      */
-    private static List<Object> generateParamListByFlag(Method method, String[] args) {
+    private List<Object> generateParamListByFlag(Method method, String[] args) {
         ArgumentsProperties argsProp = new ArgumentsProperties(args);
         Parameter[] parameterTypes = method.getParameters();
         ArrayList<Object> paramList = new ArrayList<>(parameterTypes.length);
@@ -225,10 +233,12 @@ public class ArgumentsRunner {
                     if (!Strings.isNullOrEmpty(defaultValue)) {
                         paramValue = defaultValue;
                     } else {
-                        paramList.add(Defaults.defaultValue(paramType.getType()));
-                        //TODO: 可以作为Config的一项存在，例如: 严格检查defaultValue
-                        //throw new InvalidParameterException("Parameter force is false but has no default value. (Index: " + paramIndex + ")");
-                        continue;
+                        if(config.isStrictDefaultCheck()) {
+                            throw new InvalidParameterException("Parameter force is false but has no default value. (Index: " + paramIndex + ")");
+                        } else {
+                            paramList.add(Defaults.defaultValue(paramType.getType()));
+                            continue;
+                        }
                     }
                 } else if(typeName.toLowerCase().lastIndexOf("boolean") == -1) {
                     throw new ParameterNoFoundException(method.getName(), paramIndex, paramName);
@@ -239,8 +249,8 @@ public class ArgumentsRunner {
                 if(paramValue.isEmpty()) {
                     paramList.add(Boolean.TRUE);
                 } else {
-                    paramValue = paramValue.trim();
-                    if("true t yes y".contains(paramValue.toLowerCase())) {
+                    paramValue = paramValue.trim().toLowerCase();
+                    if(config.getTrueFlag().contains(paramValue)) {
                         paramList.add(Boolean.TRUE);
                     } else {
                         paramList.add(Boolean.FALSE);
@@ -264,7 +274,7 @@ public class ArgumentsRunner {
      * @return 存放命令与方法对应关系的Map
      * @throws RunnerException 当解析出异常时抛出
      */
-    private static CommandMap parseCommandMethodFromClass(Class<?> clazz) throws RunnerException {
+    private CommandMap parseCommandMethodFromClass(Class<?> clazz) throws RunnerException {
         int classModifier = clazz.getModifiers();
         if(!Modifier.isPublic(classModifier)) {
             throw new IllegalModifierException("Class is not public");
@@ -311,6 +321,10 @@ public class ArgumentsRunner {
                 throw new IllegalCommandException("There are multiple methods for the same command: " + commandName);
             } else if(commandMethodMap.containsValue(method)) {
                 throw new IllegalCommandException("Multiple command names exist in the same method: " + commandName);
+            }
+
+            if(config.isCommandIgnoreCase()) {
+                commandName = commandName.toLowerCase();
             }
 
             commandMethodMap.put(Modifier.isStatic(modifiers) ? "Static." + commandName : commandName, method);

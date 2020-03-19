@@ -1,5 +1,7 @@
 package net.lamgc.utils.base.runner;
 
+import com.google.common.base.Defaults;
+import net.lamgc.utils.base.runner.exception.InvalidParameterException;
 import net.lamgc.utils.base.runner.exception.ParameterNoFoundException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,5 +48,37 @@ public class ArgumentsRunnerInstanceMethodTest {
         ArgumentsRunner.run(InstanceRunnerTestMain.class, testMain,
                 "preParameterNullTest -nonNullParam1 test -nonNullParam2 test2 -nonNullParam3 test3".split(" "));
     }
+
+    @Test
+    public void ignoredCommandCaseTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.setCommandIgnoreCase(true);
+        Assert.assertEquals(new ArgumentsRunner(InstanceRunnerTestMain.class, config).run(testMain, new String[]{"ignoredcommandCasetest"}), "ignoredCommandCase");
+    }
+
+    @Test
+    public void customTrueFlagTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.addTrueFlag("1");
+        Assert.assertTrue((Boolean) new ArgumentsRunner(InstanceRunnerTestMain.class, config).run(testMain, "customTrueFlagTest -flag=1".split(" ")));
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void strictDefaultCheckTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.setStrictDefaultCheck(true);
+        new ArgumentsRunner(InstanceRunnerTestMain.class, config).run(testMain, "strictDefaultCheckTest".split(" "));
+    }
+
+    @Test
+    public void nonStrictDefaultCheckTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.setStrictDefaultCheck(false);
+        Assert.assertEquals(
+                new ArgumentsRunner(InstanceRunnerTestMain.class, config)
+                        .run(testMain, "strictDefaultCheckTest".split(" ")),
+                Defaults.defaultValue(Integer.TYPE));
+    }
+
 
 }

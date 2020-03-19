@@ -65,4 +65,20 @@ public class StaticRunnerTestMain {
         Assert.assertNull("nullParam3" ,arg6);
     }
 
+    @Command
+    public static String ignoredCommandCaseTest() {
+        log.info("ignoredCommandCaseTest调用成功");
+        return "ignoredCommandCase";
+    }
+
+    @Command
+    public static boolean customTrueFlagTest(@Argument(name = "flag") boolean flag) {
+        return flag;
+    }
+
+    @Command
+    public static int strictDefaultCheckTest(@Argument(name = "num", force = false) int num) {
+        return num;
+    }
+
 }

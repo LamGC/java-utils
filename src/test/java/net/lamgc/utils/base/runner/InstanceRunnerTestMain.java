@@ -68,4 +68,20 @@ public class InstanceRunnerTestMain {
         Assert.assertNull("nullParam3" ,arg6);
     }
 
+    @Command
+    public String ignoredCommandCaseTest() {
+        log.info("ignoredCommandCaseTest调用成功");
+        return "ignoredCommandCase";
+    }
+
+    @Command
+    public boolean customTrueFlagTest(@Argument(name = "flag") boolean flag) {
+        return flag;
+    }
+
+    @Command
+    public int strictDefaultCheckTest(@Argument(name = "num", force = false) int num) {
+        return num;
+    }
+
 }
