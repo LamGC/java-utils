@@ -8,7 +8,7 @@ import java.util.Set;
 class ArgumentsRunnerConfig implements Serializable {
 
     /**
-     * 命令是否忽略大小写
+     * 命令是否忽略大小写.
      */
     private boolean commandIgnoreCase = false;
 
@@ -16,7 +16,7 @@ class ArgumentsRunnerConfig implements Serializable {
      * 是否需要参数标识(--参数 参数值).
      * @deprecated 尚未启用.
      */
-    private boolean argumentsFlag = true;
+    private boolean useArgumentFlag = true;
 
     /**
      * 严格的默认值检查.
@@ -31,7 +31,7 @@ class ArgumentsRunnerConfig implements Serializable {
     private Set<String> trueFlag = new HashSet<>(4);
 
     /**
-     * StringParameterParser存储对象
+     * StringParameterParser存储对象.
      */
     private StringParameterParserMap parameterParserMap = new StringParameterParserMap();
 
@@ -114,8 +114,8 @@ class ArgumentsRunnerConfig implements Serializable {
 
     /**
      * 命令是否忽略大小写.<br/>
+     * <br/>
      * 默认值: false
-     *
      * @param commandIgnoreCase 默认为false, true则为忽略大小写,
      *                          需要随着构造方法传入才会生效.
      */
@@ -127,26 +127,38 @@ class ArgumentsRunnerConfig implements Serializable {
      * 参数是否需要标识.
      * @return true则参数必须要有标识
      */
-    public boolean isArgumentsFlag() {
-        return argumentsFlag;
+    public boolean isUseArgumentFlag() {
+        return useArgumentFlag;
     }
 
     /**
      * 参数是否需要标识.<br/>
-     * 默认值: true
-     * <br/>
      * 当参数需要标识时, 命令行可不按参数顺序传递参数.<br/>
      * 如过参数不需要标识时, 命令行必须按照命令对应方法的参数顺序传参, 否则可能导致转换失败导致出错.<br/>
-     * @param argumentsFlag 是否需要参数标识, 默认true
+     * <br/>
+     * 默认值: true
+     * @param useArgumentFlag 是否需要参数标识, 默认true
      */
-    public void setArgumentsFlag(boolean argumentsFlag) {
-        this.argumentsFlag = argumentsFlag;
+    public void setUseArgumentFlag(boolean useArgumentFlag) {
+        this.useArgumentFlag = useArgumentFlag;
     }
 
+    /**
+     * 是否严格检查非force参数的默认值
+     * @return 返回设定值, 默认为false
+     */
     public boolean isStrictDefaultCheck() {
         return strictDefaultCheck;
     }
 
+    /**
+     * 设置是否严格检查参数force为false下的默认值.<br/>
+     * 当force为false且未设置defaultValue时, 如本项为false, 则返回默认值,
+     * 如本项为true, 则抛出{@link net.lamgc.utils.base.runner.exception.InvalidParameterException InvalidParameterException}异常.<br/>
+     * <br/>
+     * 默认值: false
+     * @param strictDefaultCheck 设定值.
+     */
     public void setStrictDefaultCheck(boolean strictDefaultCheck) {
         this.strictDefaultCheck = strictDefaultCheck;
     }
