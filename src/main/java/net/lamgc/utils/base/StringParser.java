@@ -1,24 +1,27 @@
 package net.lamgc.utils.base;
 
+/**
+ * 字符串转换器.
+ */
 public enum StringParser {
-    INT((ParserInterface<String, Integer>) Integer::parseInt),
-    SHORT((ParserInterface<String, Short>) Short::parseShort),
-    LONG((ParserInterface<String, Long>) Long::parseLong),
-    FLOAT((ParserInterface<String, Float>) Float::parseFloat),
-    DOUBLE((ParserInterface<String, Double>) Double::parseDouble),
-    CHAR((ParserInterface<String, Character>) s -> {
+    INT((ParserInterface<Integer>) Integer::parseInt),
+    SHORT((ParserInterface<Short>) Short::parseShort),
+    LONG((ParserInterface<Long>) Long::parseLong),
+    FLOAT((ParserInterface<Float>) Float::parseFloat),
+    DOUBLE((ParserInterface<Double>) Double::parseDouble),
+    CHAR((ParserInterface<Character>) s -> {
         if(s.length() == 1) {
             return s.toCharArray()[0];
         } else {
             throw new IllegalArgumentException("String length is not 1 (length: " + s.length() + "): " + s);
         }
     }),
-    STRING((ParserInterface<String, String>) s -> s),
+    STRING((ParserInterface<String>) s -> s),
     ;
 
-    public final ParserInterface<String, ?> parser;
+    public final ParserInterface<?> parser;
 
-    StringParser(ParserInterface<String, ?> parser) {
+    StringParser(ParserInterface<?> parser) {
         this.parser = parser;
     }
 
@@ -34,8 +37,8 @@ public enum StringParser {
     }
 
     @FunctionalInterface
-    public interface ParserInterface <T, R>  {
-        R parse(T content);
+    public interface ParserInterface <R>  {
+        R parse(String content);
     }
 
 }
