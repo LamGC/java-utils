@@ -9,12 +9,4 @@ public class InvalidParameterException extends DeveloperRunnerException {
         super(message);
     }
 
-    public InvalidParameterException(Throwable cause){
-        super(cause);
-    }
-
-    public InvalidParameterException(String message, Throwable cause){
-        super(cause);
-    }
-
 }
