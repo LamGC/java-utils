@@ -1,6 +1,6 @@
 package net.lamgc.utils.base.runner;
 
-import net.lamgc.utils.base.BaseTypeConverter;
+import net.lamgc.utils.base.BasicTypeConverter;
 import net.lamgc.utils.base.runner.exception.IllegalModifierException;
 
 import java.lang.reflect.Method;
@@ -51,7 +51,7 @@ public class StringParameterParserMap {
      * @return 如果存在, 返回Parser对象, 否则返回null.
      */
     public StringParameterParser<?> getParser(Type type) {
-        return parserMap.get(BaseTypeConverter.valueOfBaseTypeName(type));
+        return parserMap.get(BasicTypeConverter.valueOfBasicTypeName(type));
     }
 
     /**
@@ -60,7 +60,7 @@ public class StringParameterParserMap {
      * @return 如果存在, 返回true.
      */
     public boolean hasParser(Type type) {
-        return parserMap.containsKey(type);
+        return parserMap.containsKey(BasicTypeConverter.valueOfBasicTypeName(type));
     }
 
 
