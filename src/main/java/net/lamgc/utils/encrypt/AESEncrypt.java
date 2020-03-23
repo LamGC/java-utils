@@ -21,21 +21,7 @@ public class AESEncrypt {
      * @return AES密钥
      */
     public static SecretKey getSecretKey(String encodeRules, int keySize){
-        if(keySize <= 0){
-            //设置一个初始值
-            keySize = 128;
-        }
-        KeyGenerator keygen = null;
-        try{
-            keygen = KeyGenerator.getInstance(Algorithm);
-        } catch (NoSuchAlgorithmException ignored) {
-            //算法没问题,不会出现
-        }
-        //生成原始对称密钥
-        assert keygen != null; //用于去除Null警告
-        keygen.init(keySize, new SecureRandom(encodeRules.getBytes()));
-        //将原始对称密钥转生成为AES密钥
-        return BytesToSecretKey(keygen.generateKey().getEncoded());
+        return getSecretKey(encodeRules.getBytes(), keySize);
     }
 
     /**
@@ -49,14 +35,13 @@ public class AESEncrypt {
             //设置一个初始值
             keySize = 128;
         }
-        KeyGenerator keygen = null;
+        KeyGenerator keygen;
         try{
             keygen = KeyGenerator.getInstance(Algorithm);
-        } catch (NoSuchAlgorithmException ignored) {
-            //算法没问题,不会出现
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
         //生成原始对称密钥
-        assert keygen != null; //用于去除Null警告
         keygen.init(keySize, new SecureRandom(encodeRules));
         //将原始对称密钥转生成为AES密钥
         return BytesToSecretKey(keygen.generateKey().getEncoded());
@@ -77,14 +62,13 @@ public class AESEncrypt {
      * @throws IllegalBlockSizeException 数据块错误(可能是数据不完整导致的)
      */
     public static byte[] encrypt(byte[] data, SecretKey key) throws NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = null;
+        Cipher cipher;
         try {
             cipher = Cipher.getInstance(Algorithm);
-        } catch (NoSuchAlgorithmException ignored) {
-            //算法没问题,不会出现
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
         //初始化为加密模式,导入密钥
-        assert cipher != null; //用于去除Null警告
         //初始化密码器
         cipher.init(Cipher.ENCRYPT_MODE, key);
         //进行加密并返回数据
@@ -102,14 +86,13 @@ public class AESEncrypt {
      * @throws IllegalBlockSizeException 数据块错误(可能是数据不完整导致的)
      */
     public static byte[] decrypt(byte[] data, SecretKey key) throws NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = null;
+        Cipher cipher;
         try {
             cipher = Cipher.getInstance(Algorithm);
-        } catch (NoSuchAlgorithmException ignored) {
-            //算法没问题,不会出现
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
         //初始化为加密模式,导入密钥
-        assert cipher != null; //用于去除Null警告
         //初始化密码器
         cipher.init(Cipher.DECRYPT_MODE, key);
         //进行加密并返回数据

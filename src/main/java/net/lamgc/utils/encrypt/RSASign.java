@@ -21,13 +21,13 @@ public class RSASign {
     */ 
     public static byte[] sign(byte[] content, byte[] privateKey, SignAlgorithm algorithm) throws SignatureException, InvalidKeyException, InvalidKeySpecException{
         PKCS8EncodedKeySpec privatePKCS8 = new PKCS8EncodedKeySpec(privateKey);
-        PrivateKey priKey = null;
-        Signature signature = null;
+        PrivateKey priKey;
+        Signature signature;
         try {
             priKey = KeyFactory.getInstance("RSA").generatePrivate(privatePKCS8);
             signature = Signature.getInstance(algorithm.algorithm);
-        }catch(NoSuchAlgorithmException ignored){
-            //算法是固定的,应该不会抛出算法不支持异常
+        }catch(NoSuchAlgorithmException e){
+            throw new RuntimeException(e);
         }
         assert signature != null;
         signature.initSign(priKey);
@@ -64,13 +64,13 @@ public class RSASign {
      * @throws InvalidKeySpecException 密钥规范无效
      */
     public static boolean checkSign(byte[] content, byte[] sign, byte[] publicKey, SignAlgorithm algorithm) throws InvalidKeySpecException, InvalidKeyException, SignatureException{
-        PublicKey pubKey = null;
-        Signature signature = null;
+        PublicKey pubKey;
+        Signature signature;
         try {
             pubKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey));
             signature = Signature.getInstance(algorithm.algorithm);
-        }catch(NoSuchAlgorithmException ignored){
-            //算法是固定的,应该不会抛出算法不支持异常
+        }catch(NoSuchAlgorithmException e){
+            throw new RuntimeException(e);
         }
         assert signature != null;
         signature.initVerify(pubKey);
