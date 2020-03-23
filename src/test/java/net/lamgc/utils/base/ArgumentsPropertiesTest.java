@@ -31,14 +31,13 @@ public class ArgumentsPropertiesTest{
     public void loadTest(){
         Logger log = LoggerFactory.getLogger(ArgumentsPropertiesTest.class.getSimpleName());
         //解析参数
-        ArgumentsProperties argsProperties = new ArgumentsProperties(argsList);
+        ArgumentsProperties argsProperties = new ArgumentsProperties();
+        argsProperties.load(argsList);
         System.out.println(Arrays.toString(argsProperties.getKeysWithFlag().toArray(new String[0])));
-        int count = 0;
-        for(String key : argsProperties.keySet().toArray(new String[0])){
+        for(String key : argsProperties.getKeys().toArray(new String[0])){
             String value =  argsProperties.get(key);
             log.info("{}: {}", key, value);
             Assert.assertEquals(value, valueList.get(key));
-
         }
     }
 

@@ -34,6 +34,13 @@ public class AESEncryptTest {
     private static byte[] encryptData = null;
 
     @Test
+    public void generateKeyTest() {
+        byte[] data = new byte[256];
+        new Random().nextBytes(data);
+        AESEncrypt.getSecretKey(data, 0);
+    }
+
+    @Test
     public void A_encryptTest() throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchPaddingException {
         new Random().nextBytes(rawData);
         log.info("Generate key...[keySize: {}]", keySize);

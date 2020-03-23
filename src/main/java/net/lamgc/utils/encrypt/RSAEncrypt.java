@@ -10,6 +10,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Objects;
 
 public class RSAEncrypt {
 
@@ -71,10 +72,8 @@ public class RSAEncrypt {
      * @throws BadPaddingException 密文损坏
      * @throws IllegalBlockSizeException 密文长度错误
      */ 
-    public static byte[] encrypt(RSAPublicKey publicKey, byte[] plainTextData) throws NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {  
-        if (publicKey == null) {  
-        	throw new NullPointerException("Key == null"); 
-        }
+    public static byte[] encrypt(RSAPublicKey publicKey, byte[] plainTextData) throws NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        Objects.requireNonNull(publicKey);
         byte[] output;
         try {
             Cipher cipher = Cipher.getInstance("RSA");
@@ -84,7 +83,7 @@ public class RSAEncrypt {
             throw new RuntimeException(e);
         }
         return output;  
-    }  
+    }
    
     /** 
      * 私钥加密
@@ -97,9 +96,7 @@ public class RSAEncrypt {
      * @throws IllegalBlockSizeException 密文长度错误
      */ 
     public static byte[] encrypt(RSAPrivateKey privateKey, byte[] plainTextData) throws NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException  {  
-        if (privateKey == null) {  
-        	throw new NullPointerException("Key == null"); 
-        }
+        Objects.requireNonNull(privateKey);
         byte[] output;
         try {
             Cipher cipher = Cipher.getInstance("RSA");
@@ -109,7 +106,7 @@ public class RSAEncrypt {
             throw new RuntimeException(e);
         }
         return output;
-    }  
+    }
    
     /** 
      * 公钥/私钥解密过程 
@@ -123,9 +120,7 @@ public class RSAEncrypt {
      * @throws IllegalBlockSizeException 密文长度错误
      */ 
     public static byte[] decrypt(RSAPrivateKey privateKey, byte[] cipherData) throws NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        if (privateKey == null) {
-            throw new NullPointerException("Key == null");
-        }
+        Objects.requireNonNull(privateKey);
         byte[] output;
         try {
             Cipher cipher = Cipher.getInstance("RSA");
@@ -135,7 +130,7 @@ public class RSAEncrypt {
             throw new RuntimeException(e);
         }
         return output; 
-    }  
+    }
    
     /** 
      * 公钥解密过程 
@@ -149,9 +144,7 @@ public class RSAEncrypt {
      * @throws IllegalBlockSizeException 密文长度错误
      */ 
     public static byte[] decrypt(RSAPublicKey publicKey, byte[] cipherData) throws NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException  {
-        if (publicKey == null) {  
-        	throw new NullPointerException("Key == null");  
-        }
+        Objects.requireNonNull(publicKey);
         byte[] output;
         try {
             Cipher cipher = Cipher.getInstance("RSA");

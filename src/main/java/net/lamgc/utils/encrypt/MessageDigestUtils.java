@@ -2,14 +2,15 @@ package net.lamgc.utils.encrypt;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 public class MessageDigestUtils {
 
     public static byte[] encrypt(byte[] data, Algorithm algorithm){
         MessageDigest digest;
         try {
-            digest = MessageDigest.getInstance(algorithm.algorithmName);
-            digest.update(data);
+            digest = MessageDigest.getInstance(Objects.requireNonNull(algorithm).algorithmName);
+            digest.update(Objects.requireNonNull(data));
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

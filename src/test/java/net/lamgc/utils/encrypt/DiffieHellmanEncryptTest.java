@@ -17,9 +17,8 @@ public class DiffieHellmanEncryptTest {
 
     @Test
     public void encryptTest() throws InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
-        int KEY_SIZE = 1024;
-        DiffieHellmanEncrypt encrypt1 = new DiffieHellmanEncrypt(KEY_SIZE);
-        DiffieHellmanEncrypt encrypt2 = new DiffieHellmanEncrypt(KEY_SIZE);
+        DiffieHellmanEncrypt encrypt1 = new DiffieHellmanEncrypt();
+        DiffieHellmanEncrypt encrypt2 = new DiffieHellmanEncrypt(DiffieHellmanEncrypt.DEFAULT_KEY_SIZE);
 
         final SecretKey key1 = encrypt1.getSecretKey(encrypt2.getPublicKey().getEncoded(), ALGORITHM);
         final SecretKey key2 = encrypt2.getSecretKey(encrypt1.getPublicKey().getEncoded(), ALGORITHM);
