@@ -63,6 +63,23 @@ public class ArgumentsRunnerInstanceMethodTest {
         Assert.assertTrue((Boolean) new ArgumentsRunner(InstanceRunnerTestMain.class, config).run(testMain, "customTrueFlagTest -flag=1".split(" ")));
     }
 
+    @Test
+    public void customBooleanParserTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.addStringParameterParser(new StringParameterParser<Boolean>() {
+            @Override
+            public Boolean parse(String strValue) {
+                return strValue.equals("test");
+            }
+
+            @Override
+            public Boolean defaultValue() {
+                return Boolean.FALSE;
+            }
+        });
+        Assert.assertTrue((Boolean) new ArgumentsRunner(InstanceRunnerTestMain.class, config).run(testMain, "customTrueFlagTest -flag=test".split(" ")));
+    }
+
     @Test(expected = InvalidParameterException.class)
     public void strictDefaultCheckTest() {
         ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
@@ -80,5 +97,28 @@ public class ArgumentsRunnerInstanceMethodTest {
                 Defaults.defaultValue(Integer.TYPE));
     }
 
+    @Test
+    public void useDefaultValueInsteadOfExceptionTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.setUseDefaultValueInsteadOfException(true);
+        new ArgumentsRunner(StaticRunnerTestMain.class, config).run(new String[] {"argumentConvertTest", "-num=test"});
+    }
+
+    @Test
+    public void customStringParameterParserTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.addStringParameterParser(new StringParameterParser<Date>() {
+            @Override
+            public Date parse(String strValue) {
+                return new Date(Long.parseLong(strValue));
+            }
+
+            @Override
+            public Date defaultValue() {
+                return null;
+            }
+        });
+        new ArgumentsRunner(StaticRunnerTestMain.class, config).run(("customStringParameterParserTest -date=" + System.currentTimeMillis()).split(" "));
+    }
 
 }

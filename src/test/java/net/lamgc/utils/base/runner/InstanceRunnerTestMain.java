@@ -84,4 +84,14 @@ public class InstanceRunnerTestMain {
         return num;
     }
 
+    @Command
+    public void argumentConvertTest(@Argument(name = "num") int num) {
+        log.info("num: {}", num);
+    }
+
+    @Command
+    public void customStringParameterParserTest(@Argument(name = "date") Date date) {
+        log.info("Time: {}", date);
+    }
+
 }

@@ -81,4 +81,14 @@ public class StaticRunnerTestMain {
         return num;
     }
 
+    @Command
+    public static void argumentConvertTest(@Argument(name = "num") int num) {
+        log.info("num: {}", num);
+    }
+
+    @Command
+    public static void customStringParameterParserTest(@Argument(name = "date") Date date) {
+        log.info("Time: {}", date);
+    }
+
 }
