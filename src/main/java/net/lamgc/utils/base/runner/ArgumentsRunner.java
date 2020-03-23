@@ -3,7 +3,6 @@ package net.lamgc.utils.base.runner;
 import com.google.common.base.Defaults;
 import com.google.common.base.Strings;
 import net.lamgc.utils.base.ArgumentsProperties;
-import net.lamgc.utils.base.StringParser;
 import net.lamgc.utils.base.runner.exception.*;
 
 import java.lang.reflect.*;
@@ -204,7 +203,7 @@ public class ArgumentsRunner {
             if (argumentAnnotation == null) {
                 throw new InvalidParameterException("Parameter in method " + method.getName() + " without argument annotation (Index: " + paramIndex + ")");
             }
-            if(!checkParametersType(paramType.getType().getTypeName())) {
+            if(!checkParametersType(paramType.getType())) {
                 throw new InvalidParameterException("Method <" + method.getName() + "> Parameter has an unsupported type: " + paramType.getType() + " (Index: " + paramIndex + ")");
             }
 
@@ -240,12 +239,14 @@ public class ArgumentsRunner {
                             continue;
                         }
                     }
-                } else if(typeName.toLowerCase().lastIndexOf("boolean") == -1) {
+                } else if(!typeName.equals("boolean") && !typeName.equals(Boolean.class.getTypeName())) {
                     throw new ParameterNoFoundException(method.getName(), paramIndex, paramName);
                 }
             }
 
-            if (typeName.toLowerCase().lastIndexOf("boolean") != -1) {
+            if ((typeName.equals("boolean") || typeName.equals(Boolean.class.getTypeName())) &&
+                    !config.hasStringParameterParser(Boolean.class))
+            {
                 if(paramValue.isEmpty()) {
                     paramList.add(Boolean.TRUE);
                 } else {
@@ -256,12 +257,22 @@ public class ArgumentsRunner {
                         paramList.add(Boolean.FALSE);
                     }
                 }
+            } else if(typeName.equals(String.class.getTypeName()) && !config.hasStringParameterParser(String.class)) {
+                paramList.add(paramValue);
             } else {
+                /*if(!config.hasStringParameterParser(paramType.getType())) {
+                    throw new ParserNotFoundException(paramType.getType());
+                }*/
+
+                StringParameterParser<?> parameterParser = config.getStringParameterParser(paramType.getType());
                 try {
-                    StringParser parser = StringParser.getObjectTypeParser(paramType.getType().getTypeName());
-                    paramList.add(parser.parser.parse(paramValue));
+                    paramList.add(parameterParser.parse(paramValue));
                 } catch(Throwable e) {
-                    throw new ParseParameterException(paramName, paramValue, typeName, e);
+                    if(config.isUseDefaultValueInsteadOfException()) {
+                        paramList.add(parameterParser.defaultValue());
+                    } else {
+                        throw new ParseParameterException(paramName, paramValue, typeName, e);
+                    }
                 }
             }
         }
@@ -352,17 +363,14 @@ public class ArgumentsRunner {
 
     /**
      * 检查类型是否支持
-     * @param typeName 类型名称
+     * @param type 欲进行检查的Type类型
      * @return 支持则返回true
      */
-    private static boolean checkParametersType(String typeName){
-        HashSet<String> typeSet = new HashSet<>(Arrays.asList(
-                "int","long","short","float","double","boolean",
-
-                "java.lang.Integer","java.lang.Long","java.lang.Short",
-                "java.lang.Float","java.lang.Double","java.lang.Boolean",
-                "java.lang.String"));
-        return typeSet.contains(typeName);
+    private boolean checkParametersType(Type type){
+        String typeName = type.getTypeName();
+        return  config.hasStringParameterParser(type) ||
+                (typeName.equals("boolean") || typeName.equals(Boolean.class.getTypeName())) ||
+                type.getTypeName().equals(String.class.getTypeName());
     }
 
 }
