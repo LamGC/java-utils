@@ -218,6 +218,7 @@ public class ArgumentsRunner {
             }
 
             String typeName = paramType.getType().getTypeName();
+            StringParameterParser<?> parameterParser = config.getStringParameterParser(paramType.getType());
 
             String paramValue;
             if(argsProp.containsKey(paramName) || !argumentAnnotation.force()) {
@@ -235,7 +236,11 @@ public class ArgumentsRunner {
                         if(config.isStrictDefaultCheck()) {
                             throw new InvalidParameterException("Parameter force is false but has no default value. (Index: " + paramIndex + ")");
                         } else {
-                            paramList.add(Defaults.defaultValue(paramType.getType()));
+                            if(config.hasStringParameterParser(paramType.getType())) {
+                                paramList.add(parameterParser.defaultValue());
+                            } else {
+                                paramList.add(Defaults.defaultValue(paramType.getType()));
+                            }
                             continue;
                         }
                     }
@@ -260,11 +265,6 @@ public class ArgumentsRunner {
             } else if(typeName.equals(String.class.getTypeName()) && !config.hasStringParameterParser(String.class)) {
                 paramList.add(paramValue);
             } else {
-                /*if(!config.hasStringParameterParser(paramType.getType())) {
-                    throw new ParserNotFoundException(paramType.getType());
-                }*/
-
-                StringParameterParser<?> parameterParser = config.getStringParameterParser(paramType.getType());
                 try {
                     paramList.add(parameterParser.parse(paramValue));
                 } catch(Throwable e) {
