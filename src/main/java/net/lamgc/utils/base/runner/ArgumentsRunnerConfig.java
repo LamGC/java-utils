@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
-class ArgumentsRunnerConfig implements Serializable {
+public class ArgumentsRunnerConfig implements Serializable {
 
     /**
      * 命令是否忽略大小写.
