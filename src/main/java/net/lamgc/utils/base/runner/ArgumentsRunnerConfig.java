@@ -1,5 +1,7 @@
 package net.lamgc.utils.base.runner;
 
+import net.lamgc.utils.base.runner.parser.*;
+
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.HashSet;
@@ -13,12 +15,6 @@ class ArgumentsRunnerConfig implements Serializable {
     private boolean commandIgnoreCase = false;
 
     /**
-     * 是否需要参数标识(--参数 参数值).
-     * @deprecated 尚未启用.
-     */
-    private boolean useArgumentFlag = true;
-
-    /**
      * 严格的默认值检查.
      * 当出现参数force=false但defaultValue为空的情况下, 将抛出异常而不是设置类型默认值.
      */
@@ -29,6 +25,12 @@ class ArgumentsRunnerConfig implements Serializable {
      * 参数类型为Boolean且参数值存在的情况下, 将会判断值是否存在于trueFlag中, 如果存在, 则认为是true值.
      */
     private Set<String> trueFlag = new HashSet<>(4);
+
+    /**
+     * 转换异常时是否使用参数值而不是抛出异常.<br/>
+     * 默认值: false
+     */
+    private boolean useDefaultValueInsteadOfException = false;
 
     /**
      * StringParameterParser存储对象.
@@ -44,20 +46,28 @@ class ArgumentsRunnerConfig implements Serializable {
      * 可覆盖.
      */
     private void initialConfig() {
-        trueFlag.add("t");
-        trueFlag.add("true");
-        trueFlag.add("y");
-        trueFlag.add("yes");
+        addTrueFlag("t");
+        addTrueFlag("true");
+        addTrueFlag("y");
+        addTrueFlag("yes");
 
-
+        addStringParameterParser(new IntegerParser());
+        addStringParameterParser(new ShortParser());
+        addStringParameterParser(new LongParser());
+        addStringParameterParser(new FloatParser());
+        addStringParameterParser(new DoubleParser());
+        addStringParameterParser(new CharParser());
     }
 
     /**
      * 添加指定Type的Parser对象.<br/>
-     * 注意: 添加会导致原本的Parser被覆盖.
+     * 注意: 添加会导致原本的Parser被覆盖.<br/>
+     * 部分Type的处理: <br/>
+     * - 对Boolean的Parser: Config默认不存在对Boolean的转换, 如添加对Boolean的Parser将导致TrueFlag失效!<br/>
+     * - 对String的Parser: 如果存在对String类型的Parser, 将会提供参数原始值给Parser进行处理.
      * @param parser Parser对象
      */
-    public void addStringParameterParser(StringParameterParser<? extends Type> parser) {
+    public void addStringParameterParser(StringParameterParser<?> parser) {
         this.parameterParserMap.addParser(parser);
     }
 
@@ -74,12 +84,22 @@ class ArgumentsRunnerConfig implements Serializable {
      * @param type 欲获取的Parser对象所属的Type.
      * @return 如果获取成功返回对象, 失败返回null.
      */
-    public StringParameterParser<? extends Type> getStringParameterParser(Type type) {
+    public StringParameterParser<?> getStringParameterParser(Type type) {
         return this.parameterParserMap.getParser(type);
     }
 
     /**
-     * 添加一个代表true的值.
+     * 指定Type是否存在Parser.
+     * @param type 要检查的Type对象.
+     * @return 如果存在, 返回true.
+     */
+    public boolean hasStringParameterParser(Type type) {
+        return parameterParserMap.hasParser(type);
+    }
+
+    /**
+     * 添加一个代表true的值.<br/>
+     * 注意: 当StringParameterParser添加了对Boolean对象的Parser时, TrueFlag的设置将会失效.<br/>
      * @param flag true的代表参数值, 代表值将会经过 {@linkplain String#toLowerCase() toLowerCase()} 后存储
      */
     public void addTrueFlag(String flag) {
@@ -124,26 +144,6 @@ class ArgumentsRunnerConfig implements Serializable {
     }
 
     /**
-     * 参数是否需要标识.
-     * @return true则参数必须要有标识
-     */
-    public boolean isUseArgumentFlag() {
-        return useArgumentFlag;
-    }
-
-    /**
-     * 参数是否需要标识.<br/>
-     * 当参数需要标识时, 命令行可不按参数顺序传递参数.<br/>
-     * 如过参数不需要标识时, 命令行必须按照命令对应方法的参数顺序传参, 否则可能导致转换失败导致出错.<br/>
-     * <br/>
-     * 默认值: true
-     * @param useArgumentFlag 是否需要参数标识, 默认true
-     */
-    public void setUseArgumentFlag(boolean useArgumentFlag) {
-        this.useArgumentFlag = useArgumentFlag;
-    }
-
-    /**
      * 是否严格检查非force参数的默认值
      * @return 返回设定值, 默认为false
      */
@@ -161,5 +161,13 @@ class ArgumentsRunnerConfig implements Serializable {
      */
     public void setStrictDefaultCheck(boolean strictDefaultCheck) {
         this.strictDefaultCheck = strictDefaultCheck;
+    }
+
+    public boolean isUseDefaultValueInsteadOfException() {
+        return useDefaultValueInsteadOfException;
+    }
+
+    public void setUseDefaultValueInsteadOfException(boolean useDefaultValueInsteadOfException) {
+        this.useDefaultValueInsteadOfException = useDefaultValueInsteadOfException;
     }
 }
