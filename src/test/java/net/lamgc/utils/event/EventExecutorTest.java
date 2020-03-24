@@ -32,9 +32,9 @@ public class EventExecutorTest {
         });
         AtomicInteger invokeCount = new AtomicInteger();
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
-        SimpleEventHandler handler = new SimpleEventHandler("handler1");
+        SimpleEventHandler handler1 = new SimpleEventHandler("handler1");
         SimpleEventHandler handler2 = new SimpleEventHandler("handler2");
-        executor.addHandler(handler);
+        executor.addHandler(handler1);
         executor.addHandler(handler2);
         executor.executor(new SimpleEventObject(1, "HelloWorld", invokeCount));
         Thread.sleep(500L);
@@ -45,11 +45,17 @@ public class EventExecutorTest {
         Thread.sleep(500L);
         Assert.assertEquals(invokeCount.get(), 1);
         invokeCount.set(0);
-        executor.removeHandler(handler);
-        log.info("deleted Handler");
+        executor.removeHandler(handler1);
+        log.info("deleted handler1");
         executor.executor(new SimpleEventObject(2, "HelloWorld123", invokeCount));
         Thread.sleep(500L);
         Assert.assertEquals(invokeCount.get(), 1);
+        invokeCount.set(0);
+        executor.removeHandler(handler2);
+        log.info("deleted handler2");
+        executor.executor(new SimpleEventObject(2, "HelloWorld123", invokeCount));
+        Thread.sleep(500L);
+        Assert.assertEquals(invokeCount.get(), 0);
     }
 
     @Test
@@ -114,6 +120,24 @@ public class EventExecutorTest {
         executor.executor(new ExceptionThrowEvent(new NullPointerException()));
         Thread.sleep(1000L);
         Assert.assertTrue(handlerException.get());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void abstractClassTest() throws IllegalAccessException {
+        EventHandlerList list = new BasicEventHandlerList();
+        list.addEventHandler(AbstractEventHandler.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void interfaceClassTest() throws IllegalAccessException {
+        EventHandlerList list = new BasicEventHandlerList();
+        list.addEventHandler(EventHandler.class);
+    }
+
+    @Test(expected = IllegalAccessException.class)
+    public void protectedClassTest() throws IllegalAccessException {
+        EventHandlerList list = new BasicEventHandlerList();
+        list.addEventHandler(PrivateEventHandler.class);
     }
 
 }

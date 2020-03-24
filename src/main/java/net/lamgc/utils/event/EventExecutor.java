@@ -141,12 +141,20 @@ public class EventExecutor {
      * @param eventObject 事件对象
      * @return 返回已处理事件方法数量
      */
-    public int executor(EventHandler handler, EventObject eventObject){
-        Method[] methods = handler.getClass().getDeclaredMethods();
+    public int executor(EventHandler handler, EventObject eventObject) throws IllegalAccessException {
+        Class<?> handlerClass = handler.getClass();
+        int classModifier = handlerClass.getModifiers();
+        if(!Modifier.isPublic(classModifier)) {
+            throw new IllegalAccessException("class is not public");
+        } else if(Modifier.isInterface(classModifier) || Modifier.isAbstract(classModifier)) {
+            throw new IllegalStateException("Class is an interface or abstract");
+        }
+
+        Method[] methods = handlerClass.getDeclaredMethods();
         int invokeCount = 0;
         for (Method method : methods) {
-            int modifiers = method.getModifiers();
-            if(!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)){
+            int methodModifiers = method.getModifiers();
+            if(!Modifier.isPublic(methodModifiers)){
                 continue;
             }
             Class<?>[] types = method.getParameterTypes();

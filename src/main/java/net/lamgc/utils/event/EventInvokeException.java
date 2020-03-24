@@ -10,14 +10,11 @@ class EventInvokeException extends RuntimeException {
 
     private EventObject eventObject;
 
-    private Throwable cause;
-
     public EventInvokeException(EventHandler handler, Method handlerMethod, EventObject event, Throwable cause){
-        super();
-        this.handler = handler;
-        this.handlerMethod = handlerMethod;
-        this.eventObject = event;
-        this.cause = cause;
+        super(cause);
+        setHandler(handler);
+        setHandlerMethod(handlerMethod);
+        setEventObject(event);
     }
 
     public EventHandler getHandler() {
@@ -34,15 +31,6 @@ class EventInvokeException extends RuntimeException {
 
     public void setEventObject(EventObject eventObject) {
         this.eventObject = eventObject;
-    }
-
-    @Override
-    public Throwable getCause() {
-        return cause;
-    }
-
-    public void setCause(Throwable cause) {
-        this.cause = cause;
     }
 
     public Method getHandlerMethod() {

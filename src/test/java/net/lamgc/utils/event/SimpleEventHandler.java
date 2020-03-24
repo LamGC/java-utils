@@ -17,4 +17,9 @@ public class SimpleEventHandler implements EventHandler {
         throw new RuntimeException(event.getException());
     }
 
+    protected void protectedEvent(EventObject event) {}
+
+    public void multiParameterMethod(EventObject event, Object obj) {}
+
+    public void nonEventObjectMethod(Object obj) {}
 }
