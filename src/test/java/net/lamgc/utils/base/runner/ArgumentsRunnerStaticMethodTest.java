@@ -118,4 +118,11 @@ public class ArgumentsRunnerStaticMethodTest {
         new ArgumentsRunner(StaticRunnerTestMain.class, config).run(("customStringParameterParserTest -date=" + System.currentTimeMillis()).split(" "));
     }
 
+    @Test(expected = InvalidParameterException.class)
+    public void unsupportedParameterTypeTest() {
+        ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
+        config.removeStringParameterParser(Long.TYPE);
+        new ArgumentsRunner(StaticRunnerTestMain.class, config).run(("printTime -timeStamp=" + System.currentTimeMillis()).split(" "));
+    }
+
 }
