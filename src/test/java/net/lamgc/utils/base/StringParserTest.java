@@ -14,23 +14,35 @@ public class StringParserTest {
     @Test
     public void parseTest() {
         Multimap<String, String> testContent = HashMultimap.create();
-        testContent.put("100", "int");
-        testContent.put("100", "java.lang.Integer");
-        testContent.put("100", "short");
-        testContent.put("100", "java.lang.Short");
-        testContent.put("1000000000000", "long");
-        testContent.put("1000000000000", "java.lang.Long");
-        testContent.put("3.14", "float");
-        testContent.put("3.14", "java.lang.Float");
-        testContent.put("3.1415926", "double");
-        testContent.put("3.1415926", "java.lang.Double");
-        testContent.put("test", "java.lang.String");
+        testContent.put("100", Integer.TYPE.getTypeName());
+        testContent.put("100", Integer.class.getTypeName());
+        testContent.put("100", Short.TYPE.getTypeName());
+        testContent.put("100", Short.class.getTypeName());
+        testContent.put("1000000000000", Long.TYPE.getTypeName());
+        testContent.put("1000000000000", Long.class.getTypeName());
+        testContent.put("3.14", Float.TYPE.getTypeName());
+        testContent.put("3.14", Float.class.getTypeName());
+        testContent.put("3.1415926", Double.TYPE.getTypeName());
+        testContent.put("3.1415926", Double.class.getTypeName());
+        testContent.put("test", String.class.getTypeName());
+        testContent.put("a", Character.TYPE.getTypeName());
+        testContent.put("a", Character.class.getTypeName());
 
         testContent.forEach((content, type) -> {
             Object result = StringParser.getObjectTypeParser(type).parser.parse(content);
             log.info("Type {} Result Type: {}, Result: {}", type, result.getClass().getSimpleName(), result);
             Assert.assertEquals(content, String.valueOf(result));
         });
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unsupportedTypeTest() {
+        StringParser.getObjectTypeParser("null");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void badCharacterTest() {
+        StringParser.getObjectTypeParser(Character.class.getTypeName()).parser.parse("test");
     }
 
 }

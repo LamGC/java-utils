@@ -30,15 +30,30 @@ public class ArgumentsPropertiesTest{
     @Test
     public void loadTest(){
         Logger log = LoggerFactory.getLogger(ArgumentsPropertiesTest.class.getSimpleName());
+        StringBuilder argsStrBuilder = new StringBuilder();
+        for (String item : argsList) {
+            argsStrBuilder.append(item).append(" ");
+        }
         //解析参数
-        ArgumentsProperties argsProperties = new ArgumentsProperties();
-        argsProperties.load(argsList);
-        System.out.println(Arrays.toString(argsProperties.getKeysWithFlag().toArray(new String[0])));
+        new ArgumentsProperties();
+        ArgumentsProperties argsProperties = new ArgumentsProperties(argsList);
+        argsProperties.load(argsStrBuilder.toString());
+        log.info(Arrays.toString(argsProperties.getKeysWithFlag().toArray(new String[0])));
+        log.info(Arrays.toString(argsProperties.getRawArguments()));
         for(String key : argsProperties.getKeys().toArray(new String[0])){
-            String value =  argsProperties.get(key);
+            String value =  argsProperties.getValue(key);
             log.info("{}: {}", key, value);
             Assert.assertEquals(value, valueList.get(key));
         }
+        Assert.assertNull(argsProperties.getValue("test"));
+    }
+
+    @Test
+    public void customFlagTest() {
+        String[] args = new String[] {"*a=1", "*b", "5"};
+        ArgumentsProperties argsProp = new ArgumentsProperties(args, new String[] {"*"});
+        Assert.assertEquals(argsProp.getValue("a"), "1");
+        Assert.assertEquals(argsProp.getValue("b"), "5");
     }
 
 }

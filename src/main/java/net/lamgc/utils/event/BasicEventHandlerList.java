@@ -16,24 +16,28 @@ public class BasicEventHandlerList implements EventHandlerList {
     }
 
     @Override
-    public void addEventHandler(Class<? extends EventHandler> eventHandler) {
+    public void addEventHandler(Class<? extends EventHandler> eventHandler) throws IllegalAccessException {
+        int classModifier = eventHandler.getModifiers();
+        if(!Modifier.isPublic(classModifier)) {
+            throw new IllegalAccessException("class is not public");
+        } else if(Modifier.isInterface(classModifier) || Modifier.isAbstract(classModifier)) {
+            throw new IllegalStateException("Class is an interface or abstract");
+        }
+
         Method[] methods = eventHandler.getDeclaredMethods();
         for(Method method : methods){
-            int modifiers = method.getModifiers();
-            if(!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)){
-                //System.out.println("方法不是公开的/抽象方法/接口方法: " + modifiers);
+            int methodModifiers = method.getModifiers();
+            if(!Modifier.isPublic(methodModifiers)){
                 continue;
             }
             Class<?>[] parameterTypes = method.getParameterTypes();
             if(parameterTypes.length != 1){
-                //System.out.println("参数过多: " + parameterTypes.length);
                 continue;
             }
             if(!EventObject.class.isAssignableFrom(parameterTypes[0])){
-                //System.out.println("不是EventObject子类");
                 continue;
             }
-            addEventHandlerMethod((Class<? extends EventObject>) parameterTypes[0], method);
+            addEventHandlerMethod(parameterTypes[0].asSubclass(EventObject.class), method);
         }
     }
 
@@ -50,17 +54,14 @@ public class BasicEventHandlerList implements EventHandlerList {
         Method[] methods = handler.getDeclaredMethods();
         for(Method method : methods){
             int modifiers = method.getModifiers();
-            if(!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)){
-                //System.out.println("方法不是公开的/抽象方法/接口方法: " + modifiers);
+            if(!Modifier.isPublic(modifiers)){
                 continue;
             }
             Class<?>[] parameterTypes = method.getParameterTypes();
             if(parameterTypes.length != 1){
-                //System.out.println("参数过多: " + parameterTypes.length);
                 continue;
             }
             if(!EventObject.class.isAssignableFrom(parameterTypes[0])){
-                //System.out.println("不是EventObject子类");
                 continue;
             }
             eventMethodMap.get(parameterTypes[0]).remove(method);

@@ -51,21 +51,6 @@ public class ArgumentsProperties extends HashMap<String, String>{
         }
     }
 
-    /*
-        //通用格式
-        -key value
-        -key:value
-        
-        //长参数格式
-        --key value
-        --key:value
-        
-        //windows格式
-        /key value
-        /key:value
-        多个值需要使用:(windows) ;(linux) (自动识别)(以第一个为准)
-    */
-
     /**
      * 将参数加载进行处理
      * @param argument 参数文本
@@ -81,11 +66,15 @@ public class ArgumentsProperties extends HashMap<String, String>{
     }
 
     /**
-     * 将参数数组加载进行处理
+     * 将参数数组加载进行处理.<br/>
+     * 注意: 此前加载的内容将会被清空!
      * @param args 参数数组
      */
     public void load(final String[] args){
         rawArguments = args;
+        keyList.clear();
+        super.clear();
+
         String lastKey = null;
         for(String arg : args){
             String cacheKey = getKeyFilterFlag(arg);
