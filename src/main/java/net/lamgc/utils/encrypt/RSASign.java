@@ -29,7 +29,6 @@ public class RSASign {
         }catch(NoSuchAlgorithmException e){
             throw new RuntimeException(e);
         }
-        assert signature != null;
         signature.initSign(priKey);
         signature.update(content);
         return signature.sign();  
@@ -72,7 +71,6 @@ public class RSASign {
         }catch(NoSuchAlgorithmException e){
             throw new RuntimeException(e);
         }
-        assert signature != null;
         signature.initVerify(pubKey);
         signature.update(content);
         return signature.verify(sign);

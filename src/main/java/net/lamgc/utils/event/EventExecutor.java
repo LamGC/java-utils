@@ -146,8 +146,6 @@ public class EventExecutor {
         int classModifier = handlerClass.getModifiers();
         if(!Modifier.isPublic(classModifier)) {
             throw new IllegalAccessException("class is not public");
-        } else if(Modifier.isInterface(classModifier) || Modifier.isAbstract(classModifier)) {
-            throw new IllegalStateException("Class is an interface or abstract");
         }
 
         Method[] methods = handlerClass.getDeclaredMethods();

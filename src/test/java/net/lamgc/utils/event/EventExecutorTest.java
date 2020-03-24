@@ -32,6 +32,8 @@ public class EventExecutorTest {
         });
         AtomicInteger invokeCount = new AtomicInteger();
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        Assert.assertEquals(threadPoolExecutor, executor.getThreadPoolExecutor());
+
         SimpleEventHandler handler1 = new SimpleEventHandler("handler1");
         SimpleEventHandler handler2 = new SimpleEventHandler("handler2");
         executor.addHandler(handler1);
@@ -53,8 +55,20 @@ public class EventExecutorTest {
         invokeCount.set(0);
         executor.removeHandler(handler2);
         log.info("deleted handler2");
+
+        new Thread(() -> {
+            boolean flag = false;
+            try {
+                flag = executor.awaitTermination(2L, TimeUnit.SECONDS);
+            } catch (InterruptedException ignored) {
+
+            }
+            log.info("Executor Shutdown.(Flag: {})", flag);
+        }).start();
+
         executor.executor(new SimpleEventObject(2, "HelloWorld123", invokeCount));
         Thread.sleep(500L);
+        executor.shutdown(false);
         Assert.assertEquals(invokeCount.get(), 0);
     }
 
@@ -83,6 +97,34 @@ public class EventExecutorTest {
         log.info("[{}] done", System.currentTimeMillis());
     }
 
+    @Test
+    public void shutdownNowTest() throws IllegalAccessException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        threadPoolExecutor.setRejectedExecutionHandler((r, executor) -> {
+            try {
+                executor.getQueue().put(r);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+
+        for (int i = 0; i < 100; i++) {
+            executor.addHandler(new SimpleEventHandler("handler" + i));
+        }
+        new Thread(() -> {
+            try {
+                Assert.assertTrue(executor.awaitTermination(100L, TimeUnit.MILLISECONDS));
+            } catch (InterruptedException ignored) {
+            }
+        }).start();
+        executor.shutdown(true);
+    }
 
     @Test
     public void caughtExceptionTest() throws IllegalAccessException, InterruptedException {
@@ -102,6 +144,13 @@ public class EventExecutorTest {
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
 
         AtomicBoolean handlerException = new AtomicBoolean(false);
+        Thread.UncaughtExceptionHandler uncaughtExceptionHandler = (t, e) -> {
+            log.error("Thread({}) uncaught exception", t.getName());
+            e.printStackTrace();
+        };
+        executor.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+        Assert.assertEquals(uncaughtExceptionHandler, executor.getExceptionHandler());
+
         executor.setEventUncaughtExceptionHandler((t, handler, handlerMethod, event, cause) -> {
             log.info("Thread: [{}] {}, Handler: {}, MethodName: {}, Event: {} - throw Exception: {}",
                     t.getId(),
@@ -138,6 +187,18 @@ public class EventExecutorTest {
     public void protectedClassTest() throws IllegalAccessException {
         EventHandlerList list = new BasicEventHandlerList();
         list.addEventHandler(PrivateEventHandler.class);
+    }
+
+    @Test(expected = IllegalAccessException.class)
+    public void protectedClassTestForExecuteHandler() throws IllegalAccessException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        executor.executor(new PrivateEventHandler(), new SimpleEventObject(0, "test", null));
     }
 
 }
