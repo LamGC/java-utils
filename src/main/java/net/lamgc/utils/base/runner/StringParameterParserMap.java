@@ -19,21 +19,14 @@ public class StringParameterParserMap {
      * @throws RuntimeException
      *          当获取不到{@linkplain StringParameterParser#parse(String) StringParameterParser.parser(String)}方法时抛出{@link NoSuchMethodException}异常.
      */
-    public void addParser(StringParameterParser<?> parser) throws IllegalModifierException {
-        // 获取类型, 检查方法是否为抽象方法.
-        Class<? extends StringParameterParser> clazz = parser.getClass();
-        if(Modifier.isAbstract(clazz.getModifiers())) {
-            throw new IllegalModifierException("Class is abstract");
-        }
-
+    public void addParser(StringParameterParser<?> parser) {
         Method parseMethod;
         try {
-            parseMethod = clazz.getMethod("parse", String.class);
+            parseMethod = parser.getClass().getMethod("parse", String.class);
+            parserMap.put(parseMethod.getGenericReturnType(), parser);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-
-        parserMap.put(parseMethod.getGenericReturnType(), parser);
     }
 
     /**
@@ -42,7 +35,7 @@ public class StringParameterParserMap {
      * @return 详见 {@link java.util.Map#remove(Object)}
      */
     public StringParameterParser<?> removeParser(Type type) {
-        return parserMap.remove(type);
+        return parserMap.remove(BasicTypeConverter.valueOfBasicTypeName(type));
     }
 
     /**
