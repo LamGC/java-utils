@@ -25,7 +25,7 @@ public class ArgumentsRunner {
     private CommandMap commandMap;
 
     /**
-     * 无配置启动一个运行器
+     * 无配置启动一个运行器.
      * @param runClass 待运行的Class对象
      * @param args 运行参数
      * @return 返回命令处理方法的返回值.
@@ -38,7 +38,7 @@ public class ArgumentsRunner {
     }
 
     /**
-     * 无配置启动一个运行器
+     * 无配置启动一个运行器.
      * @param runClass 待运行的Class对象
      * @param object class的实例对象
      * @param args 运行参数
@@ -52,7 +52,9 @@ public class ArgumentsRunner {
     }
 
     /**
-     * 在调用该方法所在类启动ArgumentsRunner
+     * 在调用该方法所在类启动ArgumentsRunner.<br/>
+     * 注意: 当项目使用如SpringBoot之类的框架, 而框架存在重新打包项目并分隔目录的情况时, 请不要使用本方法!
+     * 经过重新打包的Jar将无法根据堆栈找到 RunClass.
      * @param args 参数
      * @return 返回命令处理方法的返回值.
      * @throws RunnerException 当运行器发生异常时抛出,
@@ -64,7 +66,9 @@ public class ArgumentsRunner {
     }
 
     /**
-     * 在调用该方法所在类启动ArgumentsRunner
+     * 在调用该方法所在类启动ArgumentsRunner.<br/>
+     * 注意: 当项目使用如SpringBoot之类的框架, 而框架存在重新打包项目并分隔目录的情况时, 请不要使用本方法!
+     * 经过重新打包的Jar将无法根据堆栈找到 RunClass.
      * @param object 当前方法所在的class的实例对象
      * @param args 参数
      * @return 返回命令处理方法的返回值.
@@ -80,7 +84,8 @@ public class ArgumentsRunner {
             }
             int callerElementIndex = 2;
             StackTraceElement caller = stackTraceElements[callerElementIndex];
-            while (caller.getClassName().equals(stackTraceElements[1].getClassName()) && caller.getMethodName().equals(stackTraceElements[1].getMethodName())) {
+            while (caller.getClassName().equals(stackTraceElements[1].getClassName()) &&
+                    caller.getMethodName().equals(stackTraceElements[1].getMethodName())) {
                 caller = stackTraceElements[++callerElementIndex];
             }
             Class<?> targetClass = ClassLoader.getSystemClassLoader().loadClass(caller.getClassName());
@@ -93,6 +98,18 @@ public class ArgumentsRunner {
     /**
      * 构造一个参数运行器
      * @param runClass 运行类对象
+     * @throws RunnerException 当检查Class发生异常时抛出,
+     *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
+     *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
+     */
+    public ArgumentsRunner(Class<?> runClass) {
+        this(runClass, null);
+    }
+
+    /**
+     * 构造一个参数运行器
+     * @param runClass 运行类对象
+     * @param config 运行器配置对象
      * @throws RunnerException 当检查Class发生异常时抛出,
      *                          注意检查 {@linkplain RunnerException#getExceptionTrigger()} 返回值,
      *                          该异常会标记引发原因, 详情请查看{@link RunnerException#getExceptionTrigger()}
@@ -201,10 +218,14 @@ public class ArgumentsRunner {
             paramIndex++;
             Argument argumentAnnotation = paramType.getAnnotation(Argument.class);
             if (argumentAnnotation == null) {
-                throw new InvalidParameterException("Parameter in method " + method.getName() + " without argument annotation (Index: " + paramIndex + ")");
+                throw new InvalidParameterException(
+                        "Parameter in method " + method.getName() +
+                                " without argument annotation (Index: " + paramIndex + ")");
             }
             if(!checkParametersType(paramType.getType())) {
-                throw new InvalidParameterException("Method <" + method.getName() + "> Parameter has an unsupported type: " + paramType.getType() + " (Index: " + paramIndex + ")");
+                throw new InvalidParameterException(
+                        "Method <" + method.getName() + "> Parameter has an unsupported type: " +
+                                paramType.getType() + " (Index: " + paramIndex + ")");
             }
 
             String paramName = argumentAnnotation.name();
@@ -212,7 +233,8 @@ public class ArgumentsRunner {
                 if (paramType.isNamePresent()) {
                     paramName = paramType.getName();
                 } else {
-                    throw new InvalidParameterException("Parameter name is empty. (MethodName: " + method.getName() + ", Index: " + paramIndex + ")");
+                    throw new InvalidParameterException("Parameter name is empty. (MethodName: " +
+                            method.getName() + ", Index: " + paramIndex + ")");
                 }
 
             }
@@ -227,14 +249,16 @@ public class ArgumentsRunner {
                 throw new ParameterNoFoundException(method.getName(), paramIndex, paramName);
             }
 
-            if(Strings.isNullOrEmpty(paramValue)) {
+            if(Strings.isNullOrEmpty(paramValue) &&
+                    !typeName.equals("boolean") && !typeName.equals(Boolean.class.getTypeName())) {
                 if (!argumentAnnotation.force()) {
                     String defaultValue = argumentAnnotation.defaultValue();
                     if (!Strings.isNullOrEmpty(defaultValue)) {
                         paramValue = defaultValue;
                     } else {
                         if(config.isStrictDefaultCheck()) {
-                            throw new InvalidParameterException("Parameter force is false but has no default value. (Index: " + paramIndex + ")");
+                            throw new InvalidParameterException(
+                                    "Parameter force is false but has no default value. (Index: " + paramIndex + ")");
                         } else {
                             if(config.hasStringParameterParser(paramType.getType())) {
                                 paramList.add(parameterParser.defaultValue());
@@ -244,15 +268,17 @@ public class ArgumentsRunner {
                             continue;
                         }
                     }
-                } else if(!typeName.equals("boolean") && !typeName.equals(Boolean.class.getTypeName())) {
+                } else {
                     throw new ParameterNoFoundException(method.getName(), paramIndex, paramName);
                 }
             }
 
-            if ((typeName.equals("boolean") || typeName.equals(Boolean.class.getTypeName())) &&
-                    !config.hasStringParameterParser(Boolean.class))
-            {
-                if(paramValue.isEmpty()) {
+            // 首先进行Boolean判断
+            if ((typeName.equals("boolean") || typeName.equals(Boolean.class.getTypeName()))
+                    && !config.hasStringParameterParser(Boolean.class)) {
+                if(paramValue == null) {
+                    paramList.add(Boolean.FALSE);
+                } else if(paramValue.isEmpty()) {
                     paramList.add(Boolean.TRUE);
                 } else {
                     paramValue = paramValue.trim().toLowerCase();
@@ -263,8 +289,10 @@ public class ArgumentsRunner {
                     }
                 }
             } else if(typeName.equals(String.class.getTypeName()) && !config.hasStringParameterParser(String.class)) {
+                // 如果类型为String且没有StringParameterParser, 则直接提供原始参数值
                 paramList.add(paramValue);
             } else {
+                // 使用StringParameterParser对参数进行转换
                 try {
                     paramList.add(parameterParser.parse(paramValue));
                 } catch(Throwable e) {
@@ -355,7 +383,8 @@ public class ArgumentsRunner {
         if(Modifier.isPublic(modifier) && Modifier.isStatic( modifier) && method.getName().equals("main")) {
             if (method.getReturnType().isAssignableFrom(Void.TYPE)) {
                 Class<?>[] typeClass;
-                return (typeClass = method.getParameterTypes()).length == 1 && typeClass[0].isAssignableFrom(String[].class);
+                return (typeClass = method.getParameterTypes()).length == 1 &&
+                        typeClass[0].isAssignableFrom(String[].class);
             }
         }
         return false;
