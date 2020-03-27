@@ -12,7 +12,9 @@ public class ArgumentsRunnerStaticMethodTest {
 
     @Test
     public void normalOperationTest() {
-        ArgumentsRunner.run(StaticRunnerTestMain.class, ("test-01 -propName test --length:5 /port=8080 -percentage 0.55 -bool -pi 3.1415926535898 -bool2=true").split(" "));
+        ArgumentsRunner.run(StaticRunnerTestMain.class,
+                ("test-01 -propName test --length:5 /port=8080 -percentage 0.55 -bool -pi 3.1415926535898 -bool2=true")
+                        .split(" "));
     }
 
     @Test
@@ -32,7 +34,8 @@ public class ArgumentsRunnerStaticMethodTest {
 
     @Test
     public void implicitParameterNameTest() {
-        ArgumentsRunner.run(StaticRunnerTestMain.class, ("printTime --timeStamp " + (new Date().getTime() * 1000)).split(" "));
+        ArgumentsRunner.run(StaticRunnerTestMain.class,
+                ("printTime --timeStamp " + (new Date().getTime() * 1000)).split(" "));
     }
 
     @Test
@@ -50,14 +53,16 @@ public class ArgumentsRunnerStaticMethodTest {
     public void ignoredCommandCaseTest() {
         ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
         config.setCommandIgnoreCase(true);
-        Assert.assertEquals(new ArgumentsRunner(StaticRunnerTestMain.class, config).run(new String[]{"ignoredcommandCasetest"}), "ignoredCommandCase");
+        Assert.assertEquals(new ArgumentsRunner(StaticRunnerTestMain.class, config)
+                .run(new String[]{"ignoredcommandCasetest"}), "ignoredCommandCase");
     }
 
     @Test
     public void customTrueFlagTest() {
         ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
         config.addTrueFlag("1");
-        Assert.assertTrue((Boolean) new ArgumentsRunner(StaticRunnerTestMain.class, config).run("customTrueFlagTest -flag=1".split(" ")));
+        Assert.assertTrue((Boolean) new ArgumentsRunner(StaticRunnerTestMain.class, config)
+                .run("customTrueFlagTest -flag=1".split(" ")));
     }
 
     @Test
@@ -74,7 +79,14 @@ public class ArgumentsRunnerStaticMethodTest {
                 return Boolean.FALSE;
             }
         });
-        Assert.assertTrue((Boolean) new ArgumentsRunner(StaticRunnerTestMain.class, config).run(new String[] {"customTrueFlagTest", "-flag=test"}));
+        Assert.assertTrue((Boolean) new ArgumentsRunner(StaticRunnerTestMain.class, config)
+                .run(new String[] {"customTrueFlagTest", "-flag=test"}));
+    }
+
+    @Test
+    public void noValueTrueJudgmentTest() {
+        Assert.assertTrue((Boolean) new ArgumentsRunner(StaticRunnerTestMain.class)
+                .run(new String[] {"customTrueFlagTest", "-test", "value1", "-flag"}));
     }
 
     @Test(expected = InvalidParameterException.class)
@@ -115,14 +127,16 @@ public class ArgumentsRunnerStaticMethodTest {
                 return null;
             }
         });
-        new ArgumentsRunner(StaticRunnerTestMain.class, config).run(("customStringParameterParserTest -date=" + System.currentTimeMillis()).split(" "));
+        new ArgumentsRunner(StaticRunnerTestMain.class, config)
+                .run(("customStringParameterParserTest -date=" + System.currentTimeMillis()).split(" "));
     }
 
     @Test(expected = InvalidParameterException.class)
     public void unsupportedParameterTypeTest() {
         ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
         config.removeStringParameterParser(Long.TYPE);
-        new ArgumentsRunner(StaticRunnerTestMain.class, config).run(("printTime -timeStamp=" + System.currentTimeMillis()).split(" "));
+        new ArgumentsRunner(StaticRunnerTestMain.class, config)
+                .run(("printTime -timeStamp=" + System.currentTimeMillis()).split(" "));
     }
 
 }

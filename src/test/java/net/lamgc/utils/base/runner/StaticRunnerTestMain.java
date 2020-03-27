@@ -30,7 +30,8 @@ public class StaticRunnerTestMain {
             @Argument(name = "pi", force = false, defaultValue = "3.1415926") double pi,
             @Argument(name = "bool2") boolean bool2
     ) {
-        log.info("PropName: {}, Length: {}, port: {}, percentage: {}, bool: {}, pi: {}, bool2: {}", propName, length, port, percentage, bool, pi, bool2);
+        log.info("PropName: {}, Length: {}, port: {}, percentage: {}, bool: {}, pi: {}, bool2: {}",
+                propName, length, port, percentage, bool, pi, bool2);
     }
 
     @Command(commandName = "printTime")

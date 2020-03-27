@@ -42,7 +42,7 @@ public class ArgumentsPropertiesTest{
         log.info(Arrays.toString(argsProperties.getRawArguments()));
         for(String key : argsProperties.getKeys().toArray(new String[0])){
             String value =  argsProperties.getValue(key);
-            log.info("{}: {}", key, value);
+            log.info("{}: {}", key, value == null ? "(null)" : value);
             Assert.assertEquals(value, valueList.get(key));
         }
         Assert.assertNull(argsProperties.getValue("test"));
