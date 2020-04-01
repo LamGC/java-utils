@@ -17,6 +17,8 @@ public class ArgumentsProperties extends HashMap<String, String>{
         "/"
     };
 
+    private final static Pattern pattern = Pattern.compile("/\\s*(\".+?\"|[^:\\s])+((\\s*:\\s*(\".+?\"|[^\\s])+)|)|(\".+?\"|[^\"\\s])+");
+
     private String[] keyFlags;
 
     private String[] rawArguments;
@@ -56,7 +58,6 @@ public class ArgumentsProperties extends HashMap<String, String>{
      * @param argument 参数文本
      */
     public void load(String argument) {
-        Pattern pattern = Pattern.compile("/\\s*(\".+?\"|[^:\\s])+((\\s*:\\s*(\".+?\"|[^\\s])+)|)|(\".+?\"|[^\"\\s])+");
         Matcher matcher = pattern.matcher(argument);
         ArrayList<String> argsList = new ArrayList<>();
         while (matcher.find()) {
