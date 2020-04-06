@@ -2,17 +2,23 @@ package net.lamgc.utils.event;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 public class BasicEventHandlerList implements EventHandlerList {
 
-    private HashMap<Class<? extends EventObject>, HashSet<Method>> eventMethodMap = new HashMap<>();
+    private Hashtable<Class<? extends EventObject>, HashSet<Method>> eventMethodMap = new Hashtable<>();
 
     @Override
-    public Set<Method> getEventHandlerMethod(Class<? extends EventObject> eventObject) {
-        return eventMethodMap.get(eventObject);
+    public Set<Method> getEventHandlerMethod(final Class<? extends EventObject> eventObject) {
+        HashSet<Method> methods = new HashSet<>();
+        eventMethodMap.keySet().forEach(clazz -> {
+            if(clazz.isAssignableFrom(eventObject)) {
+                methods.addAll(eventMethodMap.get(clazz));
+            }
+        });
+        return methods;
     }
 
     @Override
