@@ -159,7 +159,7 @@ public class EventExecutor {
             if(types.length != 1){
                 continue;
             }
-            if(!eventObject.getClass().isAssignableFrom(types[0])){
+            if(!types[0].isAssignableFrom(eventObject.getClass())){
                 continue;
             }
 
