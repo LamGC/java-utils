@@ -3,8 +3,7 @@ package net.lamgc.utils.base.runner;
 import net.lamgc.utils.base.BasicTypeConverter;
 import net.lamgc.utils.base.runner.exception.IllegalModifierException;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Hashtable;
 
@@ -20,12 +19,13 @@ public class StringParameterParserMap {
      *          当获取不到{@linkplain StringParameterParser#parse(String) StringParameterParser.parser(String)}方法时抛出{@link NoSuchMethodException}异常.
      */
     public void addParser(StringParameterParser<?> parser) {
-        Method parseMethod;
-        try {
-            parseMethod = parser.getClass().getMethod("parse", String.class);
-            parserMap.put(parseMethod.getGenericReturnType(), parser);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        for (Type genericInterface : parser.getClass().getGenericInterfaces()) {
+            if(genericInterface instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
+                if (StringParameterParser.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) {
+                    parserMap.put(parameterizedType.getActualTypeArguments()[0], parser);
+                }
+            }
         }
     }
 
