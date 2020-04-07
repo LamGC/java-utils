@@ -10,9 +10,11 @@ import java.security.SecureRandom;
  * AES对称加密工具类
  * @author LamGC
  */
-public class AESEncrypt {
+public final class AESEncrypt {
 
     private static final String Algorithm = "AES";
+
+    private AESEncrypt() {}
 
     /**
      * 根据密钥规则(可以是密钥)生成一个AES密钥对象
@@ -31,24 +33,11 @@ public class AESEncrypt {
      * @return AES密钥
      */
     public static SecretKey getSecretKey(byte[] encodeRules, int keySize){
-        if(keySize <= 0){
-            //设置一个初始值
-            keySize = 128;
-        }
-        KeyGenerator keygen;
-        try{
-            keygen = KeyGenerator.getInstance(Algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        //生成原始对称密钥
-        keygen.init(keySize, new SecureRandom(encodeRules));
-        //将原始对称密钥转生成为AES密钥
-        return BytesToSecretKey(keygen.generateKey().getEncoded());
+        return EncryptUtils.getSecretKey(encodeRules, keySize, Algorithm);
     }
 
     static SecretKey BytesToSecretKey(byte[] keyEncode){
-        return new SecretKeySpec(keyEncode, Algorithm);
+        return EncryptUtils.BytesToSecretKey(keyEncode, Algorithm);
     }
 
     /**

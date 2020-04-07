@@ -6,7 +6,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-public class DiffieHellmanEncrypt {
+public final class DiffieHellmanEncrypt {
 
     static {
         System.setProperty("jdk.crypto.KeyAgreement.legacyKDF", "true");
@@ -100,7 +100,7 @@ public class DiffieHellmanEncrypt {
         HmacSHA512("HmacSHA512"),
         ;
 
-        public String algorithmName;
+        public final String algorithmName;
 
         Algorithm(String algorithmName) {
             this.algorithmName = algorithmName;

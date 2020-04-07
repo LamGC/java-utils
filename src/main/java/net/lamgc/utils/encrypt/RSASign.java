@@ -7,8 +7,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-public class RSASign {
-    
+public final class RSASign {
+
+    private RSASign(){}
+
     /** 
      * RSA签名 
      * @param content 待签名数据 
@@ -25,7 +27,7 @@ public class RSASign {
         Signature signature;
         try {
             priKey = KeyFactory.getInstance("RSA").generatePrivate(privatePKCS8);
-            signature = Signature.getInstance(algorithm.algorithm);
+            signature = Signature.getInstance(algorithm.algorithmName);
         }catch(NoSuchAlgorithmException e){
             throw new RuntimeException(e);
         }
@@ -67,7 +69,7 @@ public class RSASign {
         Signature signature;
         try {
             pubKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey));
-            signature = Signature.getInstance(algorithm.algorithm);
+            signature = Signature.getInstance(algorithm.algorithmName);
         }catch(NoSuchAlgorithmException e){
             throw new RuntimeException(e);
         }
@@ -129,10 +131,10 @@ public class RSASign {
         /**
          * 指定的签名算法
          */
-        final String algorithm;
+        public final String algorithmName;
 
-        SignAlgorithm(String Algorithm){
-            this.algorithm = Algorithm;
+        SignAlgorithm(String algorithmName){
+            this.algorithmName = algorithmName;
         }
 
     }
