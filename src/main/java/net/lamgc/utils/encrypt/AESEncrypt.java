@@ -50,7 +50,7 @@ public final class AESEncrypt {
     }
 
     static SecretKey BytesToSecretKey(byte[] keyEncode){
-        return new SecretKeySpec(keyEncode, Algorithm);
+        return EncryptUtils.BytesToSecretKey(keyEncode, Algorithm);
     }
 
     /**
