@@ -7,8 +7,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-public class RSASign {
-    
+public final class RSASign {
+
+    private RSASign(){}
+
     /** 
      * RSA签名 
      * @param content 待签名数据 

@@ -12,9 +12,11 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Objects;
 
-public class RSAEncrypt {
+public final class RSAEncrypt {
 
     public static int DEFAULT_KEY_SIZE = 3072;
+
+    private RSAEncrypt() {}
 
 	/**
 	 * 生成一对RSA密钥

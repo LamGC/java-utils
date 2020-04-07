@@ -10,9 +10,11 @@ import java.security.SecureRandom;
  * AES对称加密工具类
  * @author LamGC
  */
-public class AESEncrypt {
+public final class AESEncrypt {
 
     private static final String Algorithm = "AES";
+
+    private AESEncrypt() {}
 
     /**
      * 根据密钥规则(可以是密钥)生成一个AES密钥对象

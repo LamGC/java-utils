@@ -22,7 +22,9 @@ import java.util.Arrays;
  * 通过获取keyLength来截出keyData, 通过RSA解密keyData获得AES密钥, 然后通过AES密钥解密encryptData即可,
  * 当获取了keyData后, 剩下的数据就是encryptData了.
  */
-public class RSAEncryptWithAES {
+public final class RSAEncryptWithAES {
+
+    private RSAEncryptWithAES() {}
 
     /**
      * 加密数据

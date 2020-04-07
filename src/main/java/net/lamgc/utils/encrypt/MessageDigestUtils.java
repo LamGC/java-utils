@@ -4,7 +4,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
-public class MessageDigestUtils {
+public final class MessageDigestUtils {
+
+    private MessageDigestUtils() {}
 
     public static byte[] encrypt(byte[] data, Algorithm algorithm){
         MessageDigest digest;
