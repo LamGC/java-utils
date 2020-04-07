@@ -27,7 +27,7 @@ public final class RSASign {
         Signature signature;
         try {
             priKey = KeyFactory.getInstance("RSA").generatePrivate(privatePKCS8);
-            signature = Signature.getInstance(algorithm.algorithm);
+            signature = Signature.getInstance(algorithm.algorithmName);
         }catch(NoSuchAlgorithmException e){
             throw new RuntimeException(e);
         }
@@ -69,7 +69,7 @@ public final class RSASign {
         Signature signature;
         try {
             pubKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey));
-            signature = Signature.getInstance(algorithm.algorithm);
+            signature = Signature.getInstance(algorithm.algorithmName);
         }catch(NoSuchAlgorithmException e){
             throw new RuntimeException(e);
         }
@@ -131,10 +131,10 @@ public final class RSASign {
         /**
          * 指定的签名算法
          */
-        final String algorithm;
+        public final String algorithmName;
 
-        SignAlgorithm(String Algorithm){
-            this.algorithm = Algorithm;
+        SignAlgorithm(String algorithmName){
+            this.algorithmName = algorithmName;
         }
 
     }

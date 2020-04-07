@@ -100,7 +100,7 @@ public final class DiffieHellmanEncrypt {
         HmacSHA512("HmacSHA512"),
         ;
 
-        public String algorithmName;
+        public final String algorithmName;
 
         Algorithm(String algorithmName) {
             this.algorithmName = algorithmName;

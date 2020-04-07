@@ -32,7 +32,7 @@ public final class MessageDigestUtils {
             this.algorithmName = algorithmName;
         }
 
-        public String algorithmName;
+        public final String algorithmName;
     }
 
 }
