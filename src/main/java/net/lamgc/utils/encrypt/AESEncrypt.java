@@ -33,20 +33,7 @@ public final class AESEncrypt {
      * @return AES密钥
      */
     public static SecretKey getSecretKey(byte[] encodeRules, int keySize){
-        if(keySize <= 0){
-            //设置一个初始值
-            keySize = 128;
-        }
-        KeyGenerator keygen;
-        try{
-            keygen = KeyGenerator.getInstance(Algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        //生成原始对称密钥
-        keygen.init(keySize, new SecureRandom(encodeRules));
-        //将原始对称密钥转生成为AES密钥
-        return BytesToSecretKey(keygen.generateKey().getEncoded());
+        return EncryptUtils.getSecretKey(encodeRules, keySize, Algorithm);
     }
 
     static SecretKey BytesToSecretKey(byte[] keyEncode){
