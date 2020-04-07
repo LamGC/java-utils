@@ -1,6 +1,7 @@
 package net.lamgc.utils.base.runner;
 
 import com.google.common.base.Defaults;
+import net.lamgc.utils.base.runner.exception.DeveloperRunnerException;
 import net.lamgc.utils.base.runner.exception.InvalidParameterException;
 import net.lamgc.utils.base.runner.exception.ParameterNoFoundException;
 import org.junit.Assert;
@@ -142,4 +143,13 @@ public class ArgumentsRunnerInstanceMethodTest {
                 .run(testMain, ("printTime -timeStamp=" + System.currentTimeMillis()).split(" "));
     }
 
+    @Test(expected = InvalidParameterException.class)
+    public void noAnnotationArgumentsTest() {
+        ArgumentsRunner.run(StaticRunnerTestMain.class, new String[] {"noAnnotationArgumentsTest"});
+    }
+
+    @Test(expected = DeveloperRunnerException.class)
+    public void throwExceptionTest() {
+        ArgumentsRunner.run(StaticRunnerTestMain.class, new String[] {"throwExceptionTest"});
+    }
 }

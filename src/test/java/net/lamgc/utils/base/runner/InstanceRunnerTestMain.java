@@ -76,7 +76,8 @@ public class InstanceRunnerTestMain {
     }
 
     @Command
-    public boolean customTrueFlagTest(@Argument(name = "flag") boolean flag) {
+    public static boolean customTrueFlagTest(@Argument(name = "flag") boolean flag,
+                                             @Argument(name = "flag2", force = false) Boolean flag2) {
         return flag;
     }
 
@@ -93,6 +94,14 @@ public class InstanceRunnerTestMain {
     @Command
     public void customStringParameterParserTest(@Argument(name = "date") Date date) {
         log.info("Time: {}", date);
+    }
+
+    @Command
+    public static void noAnnotationArgumentsTest(int number) {}
+
+    @Command
+    public static void throwExceptionTest() {
+        throw new RuntimeException("test");
     }
 
 }

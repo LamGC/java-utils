@@ -1,6 +1,7 @@
 package net.lamgc.utils.base.runner;
 
 import com.google.common.base.Defaults;
+import net.lamgc.utils.base.runner.exception.DeveloperRunnerException;
 import net.lamgc.utils.base.runner.exception.InvalidParameterException;
 import net.lamgc.utils.base.runner.exception.ParameterNoFoundException;
 import org.junit.Assert;
@@ -62,7 +63,7 @@ public class ArgumentsRunnerStaticMethodTest {
         ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
         config.addTrueFlag("1");
         Assert.assertTrue((Boolean) new ArgumentsRunner(StaticRunnerTestMain.class, config)
-                .run("customTrueFlagTest -flag=1".split(" ")));
+                .run("customTrueFlagTest -flag=1 -flag2:2".split(" ")));
     }
 
     @Test
@@ -80,7 +81,7 @@ public class ArgumentsRunnerStaticMethodTest {
             }
         });
         Assert.assertTrue((Boolean) new ArgumentsRunner(StaticRunnerTestMain.class, config)
-                .run(new String[] {"customTrueFlagTest", "-flag=test"}));
+                .run(new String[] {"customTrueFlagTest", "-flag=test", "-flag2=test2"}));
     }
 
     @Test
@@ -137,6 +138,16 @@ public class ArgumentsRunnerStaticMethodTest {
         config.removeStringParameterParser(Long.TYPE);
         new ArgumentsRunner(StaticRunnerTestMain.class, config)
                 .run(("printTime -timeStamp=" + System.currentTimeMillis()).split(" "));
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void noAnnotationArgumentsTest() {
+        ArgumentsRunner.run(StaticRunnerTestMain.class, new String[] {"noAnnotationArgumentsTest"});
+    }
+
+    @Test(expected = DeveloperRunnerException.class)
+    public void throwExceptionTest() {
+        ArgumentsRunner.run(StaticRunnerTestMain.class, new String[] {"throwExceptionTest"});
     }
 
 }
