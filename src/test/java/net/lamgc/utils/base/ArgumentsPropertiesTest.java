@@ -43,7 +43,7 @@ public class ArgumentsPropertiesTest{
         for(String key : argsProperties.getKeys().toArray(new String[0])){
             String value =  argsProperties.getValue(key);
             log.info("{}: {}", key, value == null ? "(null)" : value);
-            Assert.assertEquals(value, valueList.get(key));
+            Assert.assertEquals(valueList.get(key), value);
         }
         Assert.assertNull(argsProperties.getValue("test"));
     }
@@ -52,8 +52,8 @@ public class ArgumentsPropertiesTest{
     public void customFlagTest() {
         String[] args = new String[] {"*a=1", "*b", "5"};
         ArgumentsProperties argsProp = new ArgumentsProperties(args, new String[] {"*"});
-        Assert.assertEquals(argsProp.getValue("a"), "1");
-        Assert.assertEquals(argsProp.getValue("b"), "5");
+        Assert.assertEquals("1", argsProp.getValue("a"));
+        Assert.assertEquals("5", argsProp.getValue("b"));
     }
 
 }

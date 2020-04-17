@@ -54,8 +54,8 @@ public class ArgumentsRunnerStaticMethodTest {
     public void ignoredCommandCaseTest() {
         ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
         config.setCommandIgnoreCase(true);
-        Assert.assertEquals(new ArgumentsRunner(StaticRunnerTestMain.class, config)
-                .run(new String[]{"ignoredcommandCasetest"}), "ignoredCommandCase");
+        Assert.assertEquals("ignoredCommandCase", new ArgumentsRunner(StaticRunnerTestMain.class, config)
+                .run(new String[]{"ignoredcommandCasetest"}));
     }
 
     @Test
@@ -101,10 +101,9 @@ public class ArgumentsRunnerStaticMethodTest {
     public void nonStrictDefaultCheckTest() {
         ArgumentsRunnerConfig config = new ArgumentsRunnerConfig();
         config.setStrictDefaultCheck(false);
-        Assert.assertEquals(
+        Assert.assertEquals(Defaults.defaultValue(Integer.TYPE),
                 new ArgumentsRunner(StaticRunnerTestMain.class, config)
-                    .run("strictDefaultCheckTest".split(" ")),
-                Defaults.defaultValue(Integer.TYPE));
+                    .run("strictDefaultCheckTest".split(" ")));
     }
 
     @Test
