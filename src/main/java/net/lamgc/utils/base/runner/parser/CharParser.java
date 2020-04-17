@@ -14,6 +14,6 @@ public class CharParser implements StringParameterParser<Character> {
 
     @Override
     public Character defaultValue() {
-        return null;
+        return Character.MIN_VALUE;
     }
 }
