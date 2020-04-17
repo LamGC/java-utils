@@ -1,5 +1,6 @@
 package net.lamgc.utils.event;
 
+import com.google.common.base.Throwables;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -40,18 +41,18 @@ public class EventExecutorTest {
         executor.addHandler(handler2);
         executor.executor(new SimpleEventObject(1, "HelloWorld", invokeCount));
         Thread.sleep(500L);
-        Assert.assertEquals(invokeCount.get(), 2);
+        Assert.assertEquals(2, invokeCount.get());
         invokeCount.set(0);
         log.info("SingleHandlerTest-----");
         log.info("Execute Count: {}", executor.executor(handler2, new SimpleEventObject(1, "HelloWorld", invokeCount)));
         Thread.sleep(500L);
-        Assert.assertEquals(invokeCount.get(), 1);
+        Assert.assertEquals(1, invokeCount.get());
         invokeCount.set(0);
         executor.removeHandler(handler1);
         log.info("deleted handler1");
         executor.executor(new SimpleEventObject(2, "HelloWorld123", invokeCount));
         Thread.sleep(500L);
-        Assert.assertEquals(invokeCount.get(), 1);
+        Assert.assertEquals(1, invokeCount.get());
         invokeCount.set(0);
         executor.removeHandler(handler2);
         log.info("deleted handler2");
@@ -69,7 +70,7 @@ public class EventExecutorTest {
         executor.executor(new SimpleEventObject(2, "HelloWorld123", invokeCount));
         Thread.sleep(500L);
         executor.shutdown(false);
-        Assert.assertEquals(invokeCount.get(), 0);
+        Assert.assertEquals(0, invokeCount.get());
     }
 
     @Test
@@ -199,6 +200,110 @@ public class EventExecutorTest {
         );
         EventExecutor executor = new EventExecutor(threadPoolExecutor);
         executor.executor(new PrivateEventHandler(), new SimpleEventObject(0, "test", null));
+    }
+
+    @Test
+    public void eventResendTest() throws IllegalAccessException, InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        executor.setEventUncaughtExceptionHandler((thread, handler, method, object, cause) ->
+                log.error("事件执行失败.\n" +
+                         "Thread: {}\nEventHandler: {}\n HandlerMethod: {}\nEventObject: {}\nThrowableStackTrace:\n{}",
+                thread,
+                handler,
+                method,
+                object,
+                Throwables.getStackTraceAsString(cause)
+        ));
+        executor.setEnableEventResend(true);
+        final AtomicInteger invokeCount = new AtomicInteger();
+        ResendEventObject eventObject = new ResendEventObject(invokeCount);
+        executor.executor(new SimpleEventHandler("ResendEventTest"), eventObject);
+        executor.awaitTermination(100L, TimeUnit.MILLISECONDS);
+        Assert.assertEquals(2, invokeCount.get());
+    }
+
+    @Test()
+    public void disableResendTest() throws IllegalAccessException, InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        executor.setEventUncaughtExceptionHandler((thread, handler, method, object, cause) ->
+                log.error("事件执行失败.\n" +
+                         "Thread: {}\nEventHandler: {}\n HandlerMethod: {}\nEventObject: {}\nThrowableStackTrace:\n{}",
+                thread,
+                handler,
+                method,
+                object,
+                Throwables.getStackTraceAsString(cause)
+        ));
+        executor.setEnableEventResend(false);
+        final AtomicInteger invokeCount = new AtomicInteger();
+        ResendEventObject eventObject = new ResendEventObject(invokeCount);
+        executor.executor(new SimpleEventHandler("ResendEventTest"), eventObject);
+        executor.awaitTermination(100L, TimeUnit.MILLISECONDS);
+        Assert.assertEquals(1, invokeCount.get());
+    }
+
+    @Test
+    public void eventResendWithSyncTest() throws IllegalAccessException, InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        executor.setEventUncaughtExceptionHandler((thread, handler, method, object, cause) ->
+                log.error("事件执行失败.\n" +
+                                "Thread: {}\nEventHandler: {}\n HandlerMethod: {}\nEventObject: {}\nThrowableStackTrace:\n{}",
+                        thread,
+                        handler,
+                        method,
+                        object,
+                        Throwables.getStackTraceAsString(cause)
+                ));
+        executor.setEnableEventResend(true);
+        final AtomicInteger invokeCount = new AtomicInteger();
+        ResendEventObject eventObject = new ResendEventObject(invokeCount);
+        executor.addHandler(new SimpleEventHandler("ResendEventTest"));
+        executor.executorSync(eventObject);
+        Assert.assertEquals(2, invokeCount.get());
+    }
+
+    @Test()
+    public void disableResendWithSyncTest() throws IllegalAccessException, InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                Runtime.getRuntime().availableProcessors() / 2,
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        executor.setEventUncaughtExceptionHandler((thread, handler, method, object, cause) ->
+                log.error("事件执行失败.\n" +
+                                "Thread: {}\nEventHandler: {}\n HandlerMethod: {}\nEventObject: {}\nThrowableStackTrace:\n{}",
+                        thread,
+                        handler,
+                        method,
+                        object,
+                        Throwables.getStackTraceAsString(cause)
+                ));
+        executor.setEnableEventResend(false);
+        final AtomicInteger invokeCount = new AtomicInteger();
+        ResendEventObject eventObject = new ResendEventObject(invokeCount);
+        executor.addHandler(new SimpleEventHandler("ResendEventTest"));
+        executor.executorSync(eventObject);
+        Assert.assertEquals(1, invokeCount.get());
     }
 
 }

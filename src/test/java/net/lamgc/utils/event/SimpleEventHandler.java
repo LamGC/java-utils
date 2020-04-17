@@ -13,6 +13,13 @@ public class SimpleEventHandler implements EventHandler {
         event.invokeCount.incrementAndGet();
     }
 
+    public void resendTestEvent(ResendEventObject event) {
+        event.addInvokeCount();
+        if(event.isFirstInvoke()) {
+            EventExecutor.resendCurrentEvent();
+        }
+    }
+
     public void throwExceptionEvent(ExceptionThrowEvent event){
         throw new RuntimeException(event.getException());
     }

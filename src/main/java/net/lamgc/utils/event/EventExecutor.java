@@ -4,10 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,8 +25,8 @@ public class EventExecutor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     private final AtomicReference<Thread.UncaughtExceptionHandler> exceptionHandler = new AtomicReference<>();
-
     private final AtomicReference<EventUncaughtExceptionHandler> eventExceptionHandler = new AtomicReference<>();
+    private final AtomicBoolean enableEventResend = new AtomicBoolean();
 
     /**
      * 构造一个EventExecutor.
@@ -170,6 +172,17 @@ public class EventExecutor {
     }
 
     /**
+     * 设置事件重投是否启用.<br/>
+     * 事件重新投递(事件重投, EventResend)可以将当前EventHandler的方法处理的事件再次投递给当前EventHandler再次进行处理,
+     * 通过事件重投, 可以做到例如让事件延迟处理的能力.
+     * @param enable 如果启用,
+     *               则EventHandler内的事件处理方法将可以调用{@link #resendCurrentEvent()}重新投递当前任务到该EventHandler.
+     */
+    public void setEnableEventResend(boolean enable) {
+        enableEventResend.set(enable);
+    }
+
+    /**
      * 对指定EventHandler的Method投递事件.
      * @param handler 要投递事件的EventHandler对象
      * @param event 事件对象
@@ -181,13 +194,25 @@ public class EventExecutor {
                               final Method eventMethod,
                               final AtomicInteger executeCount){
         if(executeCount == null){
-            threadPoolExecutor.execute(createEventTask(handler, event, eventMethod));
+            threadPoolExecutor.execute(() -> {
+                if(enableEventResend.get()) {
+                    setThreadResendInfo(this, handler, event);
+                }
+                createEventTask(handler, event, eventMethod).run();
+                clearThreadResendInfo();
+            });
         } else {
             executeCount.incrementAndGet();
             threadPoolExecutor.execute(() -> {
                 try {
+                    if(enableEventResend.get()) {
+                        setThreadResendInfo(this, handler, event);
+                    }
                     createEventTask(handler, event, eventMethod).run();
                 } finally {
+                    if(enableEventResend.get()) {
+                        clearThreadResendInfo();
+                    }
                     int count = executeCount.decrementAndGet();
                     if (count == 0) {
                         synchronized (executeCount) {
@@ -279,6 +304,50 @@ public class EventExecutor {
      */
     public void setEventUncaughtExceptionHandler(EventUncaughtExceptionHandler handler){
         this.eventExceptionHandler.set(handler);
+    }
+
+    private final static ThreadLocal<EventExecutor> threadEventExecutor = new ThreadLocal<>();
+    private final static ThreadLocal<EventHandler> threadEventHandler = new ThreadLocal<>();
+    private final static ThreadLocal<EventObject> threadEventObject = new ThreadLocal<>();
+
+    /**
+     * 设置当前线程的事件重投信息
+     * @param executor 当前事件执行器
+     * @param currentHandler 当前EventHandler对象
+     * @param currentObject 当前EventObject对象
+     */
+    private static void setThreadResendInfo(EventExecutor executor, EventHandler currentHandler, EventObject currentObject) {
+        threadEventExecutor.set(Objects.requireNonNull(executor));
+        threadEventHandler.set(Objects.requireNonNull(currentHandler));
+        threadEventObject.set(Objects.requireNonNull(currentObject));
+    }
+
+    /**
+     * 清除事件重投信息.
+     */
+    private static void clearThreadResendInfo() {
+        threadEventExecutor.set(null);
+        threadEventHandler.set(null);
+        threadEventObject.set(null);
+    }
+
+    /**
+     * 重新投递当前任务到当前Handler.<br/>
+     * 该操作不会将任务投递到其他Handler.<br/>
+     * 注意: 该方法本身并不会阻止多次调用, 故事件处理方法需自行控制重新投递操作.<br/>
+     */
+    public static void resendCurrentEvent() {
+        EventExecutor executor = threadEventExecutor.get();
+        if(executor == null) {
+            throw new UnsupportedOperationException("Resend not enabled");
+        }
+
+        try {
+            executor.executor(threadEventHandler.get(), threadEventObject.get());
+
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override

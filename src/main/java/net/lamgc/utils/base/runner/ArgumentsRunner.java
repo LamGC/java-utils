@@ -19,6 +19,9 @@ import java.util.regex.Pattern;
  */
 public class ArgumentsRunner {
 
+
+    private final static Pattern COMMAND_NAME_CHECK_PATTERN = Pattern.compile("^[A-Za-z_$]+[A-Za-z0-9_\\-$]+$");
+
     private final ArgumentsRunnerConfig config;
 
     private final Class<?> runClass;
@@ -323,7 +326,6 @@ public class ArgumentsRunner {
 
         Method[] methods = clazz.getDeclaredMethods();
         CommandMap commandMethodMap = new CommandMap(methods.length);
-        Pattern flagCheckPattern = Pattern.compile("^[A-Za-z_$]+[A-Za-z0-9_\\-$]+$");
         for(Method method : methods) {
             if(isMainMethod(method)) {
                 continue;
@@ -346,7 +348,7 @@ public class ArgumentsRunner {
                 commandName = method.getName();
             }
 
-            if (!flagCheckPattern.matcher(commandName).matches()) {
+            if (!COMMAND_NAME_CHECK_PATTERN.matcher(commandName).matches()) {
                 throw new IllegalCommandException("Illegal command name: " + commandName);
             }
 
@@ -401,5 +403,11 @@ public class ArgumentsRunner {
                 (typeName.equals("boolean") || typeName.equals(Boolean.class.getTypeName())) ||
                 type.getTypeName().equals(String.class.getTypeName());
     }
+
+    /*
+        TODO(LamGC, 2020.04.08) - Plan:
+            - 支持可选的对象注入, 而不是只能传入可转换参数 (参考Spring参数)
+            - 仅限制特殊符号的使用而不限制语言字符
+     */
 
 }
