@@ -13,8 +13,7 @@ public class ArgumentsProperties extends HashMap<String, String>{
 
     private static transient final String[] defaultKeyFlags = new String[] {
         "--",
-        "-",
-        "/"
+        "-"
     };
 
     private final static Pattern pattern = Pattern.compile("/\\s*(\".+?\"|[^:\\s])+((\\s*:\\s*(\".+?\"|[^\\s])+)|)|(\".+?\"|[^\"\\s])+");
