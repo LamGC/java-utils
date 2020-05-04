@@ -277,6 +277,8 @@ public class EventExecutorTest {
         ResendEventObject eventObject = new ResendEventObject(invokeCount);
         executor.addHandler(new SimpleEventHandler("ResendEventTest"));
         executor.executorSync(eventObject);
+        threadPoolExecutor.shutdown();
+        executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         Assert.assertEquals(2, invokeCount.get());
     }
 
@@ -303,6 +305,8 @@ public class EventExecutorTest {
         ResendEventObject eventObject = new ResendEventObject(invokeCount);
         executor.addHandler(new SimpleEventHandler("ResendEventTest"));
         executor.executorSync(eventObject);
+        threadPoolExecutor.shutdown();
+        executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         Assert.assertEquals(1, invokeCount.get());
     }
 
