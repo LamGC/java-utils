@@ -6,7 +6,7 @@
 
   <groupId>net.lamgc</groupId>
   <artifactId>java-utils</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0_20200505.1-SNAPSHOT</version>
 
   <packaging>jar</packaging>
 
