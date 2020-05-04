@@ -10,18 +10,15 @@ import java.util.HashMap;
 
 public class ArgumentsPropertiesTest{
 
-    private final String[] argsList = {"/a", "233", "/b : 12", "-c", "34", "-d:56", "--EF", "78", "--GH:90", "/IJ", "--KL", "-MN"};
+    private final String[] argsList = {"-c", "34", "-d:56", "--EF", "78", "--GH:90", "--KL", "-MN"};
 
     private final static HashMap<String, String> valueList = new HashMap<>();
 
     static {
-        valueList.put("a", "233");
-        valueList.put("b", "12");
         valueList.put("c", "34");
         valueList.put("d", "56");
         valueList.put("EF", "78");
         valueList.put("GH", "90");
-        valueList.put("IJ", "");
         valueList.put("KL", "");
         valueList.put("MN", "");
     }

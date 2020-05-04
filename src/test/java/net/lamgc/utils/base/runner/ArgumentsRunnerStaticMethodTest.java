@@ -14,7 +14,7 @@ public class ArgumentsRunnerStaticMethodTest {
     @Test
     public void normalOperationTest() {
         ArgumentsRunner.run(StaticRunnerTestMain.class,
-                ("test-01 -propName test --length:5 /port=8080 -percentage 0.55 -bool -pi 3.1415926535898 -bool2=true")
+                ("test-01 -propName test --length:5 -port=8080 -percentage 0.55 -bool -pi 3.1415926535898 -bool2=true")
                         .split(" "));
     }
 
