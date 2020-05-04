@@ -153,18 +153,10 @@ public class EventExecutor {
         Method[] methods = handlerClass.getDeclaredMethods();
         int invokeCount = 0;
         for (Method method : methods) {
-            int methodModifiers = method.getModifiers();
-            if(!Modifier.isPublic(methodModifiers)){
+            if(!checkMethod(method, eventObject)) {
                 continue;
             }
-            Class<?>[] types = method.getParameterTypes();
-            if(types.length != 1){
-                continue;
-            }
-            if(!types[0].isAssignableFrom(eventObject.getClass())){
-                continue;
-            }
-
+            
             executeEvent(handler, eventObject, method, null);
             invokeCount++;
         }
@@ -350,6 +342,43 @@ public class EventExecutor {
         }
     }
 
+    /**
+     * 检查指定方法是否为合法的事件接收方法
+     * @param method 待检查的方法
+     * @return 如果是合法的事件接收方法, 返回true
+     */
+    public static boolean checkMethod(Method method) {
+        return checkMethod(method, null);
+    }
+
+    /**
+     * 检查指定方法是否为合法的事件接收方法
+     * @param method 待检查的方法
+     * @param eventObject 指定的EventObject, 如没有指定可为null, 指定后, 将会检查继承性
+     * @return 如果是合法的事件接收方法, 返回true
+     */
+    private static boolean checkMethod(Method method, EventObject eventObject) {
+        int methodModifiers = method.getModifiers();
+        if(!Modifier.isPublic(methodModifiers)){
+            return false;
+        }
+        Class<?>[] types = method.getParameterTypes();
+        if(types.length != 1){
+            return false;
+        }
+        if(eventObject == null) {
+            if(!EventObject.class.isAssignableFrom(types[0])) {
+                return false;
+            }
+        } else {
+            if(!types[0].isAssignableFrom(eventObject.getClass())) {
+                return false;
+            }
+        }
+
+        return method.getDeclaredAnnotation(NotAccepted.class) == null;
+    }
+    
     @Override
     protected void finalize() {
         threadPoolExecutor.shutdownNow();

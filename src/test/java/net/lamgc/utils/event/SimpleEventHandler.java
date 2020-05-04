@@ -13,6 +13,12 @@ public class SimpleEventHandler implements EventHandler {
         event.invokeCount.incrementAndGet();
     }
 
+    @NotAccepted
+    public void ignoredEventHandler(SimpleEventObject event){
+        System.out.println(this.toString() + "." + flag + " - [" + event.errorCode + "] " + event.msg);
+        event.invokeCount.incrementAndGet();
+    }
+
     public void resendTestEvent(ResendEventObject event) {
         event.addInvokeCount();
         if(event.isFirstInvoke()) {

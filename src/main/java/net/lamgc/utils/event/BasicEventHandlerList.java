@@ -32,15 +32,8 @@ public class BasicEventHandlerList implements EventHandlerList {
 
         Method[] methods = eventHandler.getDeclaredMethods();
         for(Method method : methods){
-            int methodModifiers = method.getModifiers();
-            if(!Modifier.isPublic(methodModifiers)){
-                continue;
-            }
             Class<?>[] parameterTypes = method.getParameterTypes();
-            if(parameterTypes.length != 1){
-                continue;
-            }
-            if(!EventObject.class.isAssignableFrom(parameterTypes[0])){
+            if(!EventExecutor.checkMethod(method)) {
                 continue;
             }
             addEventHandlerMethod(parameterTypes[0].asSubclass(EventObject.class), method);
