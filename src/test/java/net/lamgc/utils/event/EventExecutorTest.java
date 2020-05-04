@@ -20,7 +20,7 @@ public class EventExecutorTest {
     public void executorTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -77,7 +77,7 @@ public class EventExecutorTest {
     public void syncExecuteTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -102,7 +102,7 @@ public class EventExecutorTest {
     public void shutdownNowTest() throws IllegalAccessException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -131,7 +131,7 @@ public class EventExecutorTest {
     public void caughtExceptionTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -194,7 +194,7 @@ public class EventExecutorTest {
     public void protectedClassTestForExecuteHandler() throws IllegalAccessException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -206,7 +206,7 @@ public class EventExecutorTest {
     public void eventResendTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -232,7 +232,7 @@ public class EventExecutorTest {
     public void disableResendTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -258,7 +258,7 @@ public class EventExecutorTest {
     public void eventResendWithSyncTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
@@ -284,7 +284,7 @@ public class EventExecutorTest {
     public void disableResendWithSyncTest() throws IllegalAccessException, InterruptedException {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 1,
-                Runtime.getRuntime().availableProcessors() / 2,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
                 30L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10)
         );
