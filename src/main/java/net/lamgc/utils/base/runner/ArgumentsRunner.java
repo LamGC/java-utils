@@ -189,8 +189,10 @@ public class ArgumentsRunner {
         paramList.toArray(params);
         try {
             return targetMethod.invoke(object, params);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             throw new DeveloperRunnerException(e);
+        } catch (InvocationTargetException e) {
+            throw new DeveloperRunnerException(e.getTargetException());
         }
 
     }

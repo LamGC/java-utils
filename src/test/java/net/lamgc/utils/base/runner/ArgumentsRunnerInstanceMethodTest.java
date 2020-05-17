@@ -12,7 +12,12 @@ import java.util.Date;
 public class ArgumentsRunnerInstanceMethodTest {
 
     private static InstanceRunnerTestMain testMain = new InstanceRunnerTestMain();
-    
+
+    @Test
+    public void getCommandNamesTest() {
+        new ArgumentsRunner(InstanceRunnerTestMain.class).getCommandNames();
+    }
+
     @Test
     public void normalOperationTest() {
         ArgumentsRunner.run(InstanceRunnerTestMain.class, testMain,
