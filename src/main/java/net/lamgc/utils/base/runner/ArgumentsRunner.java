@@ -10,12 +10,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * 命令行参数运行器.<br/>
- * 该运行器根据传入的参数, 自动选择指定类中带有{@linkplain Command Command标注}的方法, 且支持参数传入.<br/>
- * 运行格式:
- * <pre>
- *     java -jar jarFile <Command> [Arguments...]
- * </pre>
+ * 命令行参数运行器.<br>
+ * 该运行器根据传入的参数, 自动选择指定类中带有{@linkplain Command Command标注}的方法, 且支持参数传入.<br>
+ * 运行格式: {@code java -jar jarFile <Command> [Arguments...]}
  */
 public class ArgumentsRunner {
 
@@ -55,7 +52,7 @@ public class ArgumentsRunner {
     }
 
     /**
-     * 在调用该方法所在类启动ArgumentsRunner.<br/>
+     * 在调用该方法所在类启动ArgumentsRunner.<br>
      * 注意: 当项目使用如SpringBoot之类的框架, 而框架存在重新打包项目并分隔目录的情况时, 请不要使用本方法!
      * 经过重新打包的Jar将无法根据堆栈找到 RunClass.
      * @param args 参数
@@ -69,7 +66,7 @@ public class ArgumentsRunner {
     }
 
     /**
-     * 在调用该方法所在类启动ArgumentsRunner.<br/>
+     * 在调用该方法所在类启动ArgumentsRunner.<br>
      * 注意: 当项目使用如SpringBoot之类的框架, 而框架存在重新打包项目并分隔目录的情况时, 请不要使用本方法!
      * 经过重新打包的Jar将无法根据堆栈找到 RunClass.
      * @param object 当前方法所在的class的实例对象
@@ -198,8 +195,8 @@ public class ArgumentsRunner {
     }
 
     /**
-     * 获取已获得的命令名. <br/>
-     * 命令根据方法静态与否, 在命令名前有静态表示的 "Static." 前缀, <br/>
+     * 获取已获得的命令名. <br>
+     * 命令根据方法静态与否, 在命令名前有静态表示的 "Static." 前缀, <br>
      * 例如实例命令方法 "Command",
      * 如果是静态方法, 则为 "Static.Command"
      * @return 返回存储命令名的Set对象, 如尚未解析Class内的方法, 则返回null

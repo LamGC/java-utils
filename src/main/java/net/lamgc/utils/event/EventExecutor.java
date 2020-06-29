@@ -116,6 +116,7 @@ public class EventExecutor {
      * 同步投递事件.
      * 方法将会在事件执行结束后返回.
      * @param eventObject 需投递的事件对象
+     * @throws InterruptedException 当等待执行完成时发生中断, 则抛出异常.
      */
     public void executorSync(final EventObject eventObject) throws InterruptedException {
         Set<Method> eventHandlerMethod = eventHandlerList.getEventHandlerMethod(eventObject.getClass());
@@ -142,6 +143,7 @@ public class EventExecutor {
      * @param handler 要进行事件投递的EventHandler
      * @param eventObject 事件对象
      * @return 返回已处理事件方法数量
+     * @throws IllegalAccessException 当EventHandler访问权不为public时抛出异常.
      */
     public int executor(EventHandler handler, EventObject eventObject) throws IllegalAccessException {
         Class<?> handlerClass = handler.getClass();
@@ -164,7 +166,7 @@ public class EventExecutor {
     }
 
     /**
-     * 设置事件重投是否启用.<br/>
+     * 设置事件重投是否启用.<br>
      * 事件重新投递(事件重投, EventResend)可以将当前EventHandler的方法处理的事件再次投递给当前EventHandler再次进行处理,
      * 通过事件重投, 可以做到例如让事件延迟处理的能力.
      * @param enable 如果启用,
@@ -324,9 +326,9 @@ public class EventExecutor {
     }
 
     /**
-     * 重新投递当前任务到当前Handler.<br/>
-     * 该操作不会将任务投递到其他Handler.<br/>
-     * 注意: 该方法本身并不会阻止多次调用, 故事件处理方法需自行控制重新投递操作.<br/>
+     * 重新投递当前任务到当前Handler.<br>
+     * 该操作不会将任务投递到其他Handler.<br>
+     * 注意: 该方法本身并不会阻止多次调用, 故事件处理方法需自行控制重新投递操作.<br>
      */
     public static void resendCurrentEvent() {
         EventExecutor executor = threadEventExecutor.get();

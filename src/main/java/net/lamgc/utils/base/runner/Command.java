@@ -14,14 +14,14 @@ import java.lang.annotation.Target;
 public @interface Command {
 
     /**
-     * 命令名.<br/>
+     * 命令名.<br>
      * 如果填空, 则使用方法名.
      * @return 方法所属的命令名
      */
     String commandName() default "";
 
     /**
-     * 是否为默认方法.<br/>
+     * 是否为默认方法.<br>
      * 默认方法需要没有参数, 否则该参数将会被忽略.
      * @return 如果为默认方法则为true
      */

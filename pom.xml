@@ -43,6 +43,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.javadocEncoding>UTF-8</project.build.javadocEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
@@ -84,7 +85,6 @@
   </distributionManagement>
 
   <build>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
@@ -130,11 +130,13 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
+          <version>2.4</version>
           <executions>
             <execution>
               <id>attach-sources</id>
+              <phase>package</phase>
               <goals>
-                <goal>jar-no-fork</goal>
+                <goal>jar</goal>
               </goals>
             </execution>
           </executions>
@@ -142,21 +144,23 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.10.2</version>
+          <configuration>
+            <aggregate>true</aggregate>
+            <charset>UTF-8</charset>
+            <encoding>UTF-8</encoding>
+            <docencoding>UTF-8</docencoding>
+          </configuration>
           <executions>
             <execution>
               <id>attach-javadocs</id>
+              <phase>package</phase>
               <goals>
                 <goal>jar</goal>
               </goals>
-              <configuration>
-                <additionalOption>
-                  <additionalOption>-Xdoclint:none</additionalOption>
-                </additionalOption>
-              </configuration>
             </execution>
           </executions>
         </plugin>
       </plugins>
-    </pluginManagement>
   </build>
 </project>

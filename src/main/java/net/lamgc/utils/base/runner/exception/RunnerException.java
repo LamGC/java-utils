@@ -9,13 +9,13 @@ package net.lamgc.utils.base.runner.exception;
 public class RunnerException extends RuntimeException {
 
     /**
-     * 该异常由用户引起.<br/>
+     * 该异常由用户引起.<br>
      * 当Trigger为该值时, 代表异常是由于用户输入原因导致的, 这种异常的出现是偶然的.
      */
     public final static int TRIGGER_USER = 1;
 
     /**
-     * 该异常由开发者引起.<br/>
+     * 该异常由开发者引起.<br>
      * 当Trigger为该值时, 代表异常是由于代码层次原因导致的, 这种异常的出现是必然的.
      */
     public final static int TRIGGER_DEVELOPER = 2;
