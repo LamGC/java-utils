@@ -16,13 +16,12 @@ import java.util.regex.Pattern;
  */
 public class ArgumentsRunner {
 
-
-    private final static Pattern COMMAND_NAME_CHECK_PATTERN = Pattern.compile("^[^ .]+$");
+    private final static Pattern COMMAND_NAME_CHECK_PATTERN = Pattern.compile("^[^ ]+$");
 
     private final ArgumentsRunnerConfig config;
 
     private final Class<?> runClass;
-    private CommandMap commandMap;
+    private final CommandMap commandMap;
 
     /**
      * 无配置启动一个运行器.
