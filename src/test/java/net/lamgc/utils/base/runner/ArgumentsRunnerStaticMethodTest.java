@@ -17,10 +17,9 @@ public class ArgumentsRunnerStaticMethodTest {
     @Test
     public void getCommandNamesTest() {
         Set<String> commandNames = new ArgumentsRunner(StaticRunnerTestMain.class).getCommandNames();
-        String[] commandNamesArr = new String[commandNames.size()];
-        commandNames.toArray(commandNamesArr);
-        LoggerFactory.getLogger(ArgumentsRunnerStaticMethodTest.class)
-                .info("Commands: {}", Arrays.toString(commandNamesArr));
+        String[] commands = new String[commandNames.size()];
+        commandNames.toArray(commands);
+        LoggerFactory.getLogger(this.getClass().getSimpleName()).info("Commands: {}", Arrays.toString(commands));
     }
 
     @Test

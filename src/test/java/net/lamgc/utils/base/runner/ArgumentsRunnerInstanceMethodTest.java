@@ -14,15 +14,14 @@ import java.util.Set;
 
 public class ArgumentsRunnerInstanceMethodTest {
 
-    private static InstanceRunnerTestMain testMain = new InstanceRunnerTestMain();
+    private final static InstanceRunnerTestMain testMain = new InstanceRunnerTestMain();
 
     @Test
     public void getCommandNamesTest() {
         Set<String> commandNames = new ArgumentsRunner(InstanceRunnerTestMain.class).getCommandNames();
-        String[] commandNamesArr = new String[commandNames.size()];
-        commandNames.toArray(commandNamesArr);
-        LoggerFactory.getLogger(ArgumentsRunnerInstanceMethodTest.class)
-                .info("Commands: {}", Arrays.toString(commandNamesArr));
+        String[] commands = new String[commandNames.size()];
+        commandNames.toArray(commands);
+        LoggerFactory.getLogger(this.getClass().getSimpleName()).info("Commands: {}", Arrays.toString(commands));
     }
 
     @Test
