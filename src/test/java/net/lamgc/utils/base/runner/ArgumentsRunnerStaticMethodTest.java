@@ -6,14 +6,21 @@ import net.lamgc.utils.base.runner.exception.InvalidParameterException;
 import net.lamgc.utils.base.runner.exception.ParameterNoFoundException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 public class ArgumentsRunnerStaticMethodTest {
 
     @Test
     public void getCommandNamesTest() {
-        new ArgumentsRunner(InstanceRunnerTestMain.class).getCommandNames();
+        Set<String> commandNames = new ArgumentsRunner(StaticRunnerTestMain.class).getCommandNames();
+        String[] commandNamesArr = new String[commandNames.size()];
+        commandNames.toArray(commandNamesArr);
+        LoggerFactory.getLogger(ArgumentsRunnerStaticMethodTest.class)
+                .info("Commands: {}", Arrays.toString(commandNamesArr));
     }
 
     @Test
