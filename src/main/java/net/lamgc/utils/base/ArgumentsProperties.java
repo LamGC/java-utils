@@ -7,6 +7,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 参数解析器, 支持Linux长短参数写法
+ * @deprecated 请使用Apache Commons-Cli 套件中的参数解析器
+ */
+@Deprecated
 public class ArgumentsProperties extends HashMap<String, String>{
 
     private static final long serialVersionUID = 3008463812837214134L;
@@ -18,11 +23,11 @@ public class ArgumentsProperties extends HashMap<String, String>{
 
     private final static Pattern pattern = Pattern.compile("/\\s*(\".+?\"|[^:\\s])+((\\s*:\\s*(\".+?\"|[^\\s])+)|)|(\".+?\"|[^\"\\s])+");
 
-    private String[] keyFlags;
+    private final String[] keyFlags;
 
     private String[] rawArguments;
 
-    private ArrayList<String> keyList = new ArrayList<>();
+    private final ArrayList<String> keyList = new ArrayList<>();
 
     /**
      * 构造一个ArgumentsProperties.
