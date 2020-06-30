@@ -12,6 +12,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Objects;
 
+/**
+ * RSA加密类.
+ */
 public final class RSAEncrypt {
 
     public static int DEFAULT_KEY_SIZE = 3072;
@@ -28,7 +31,7 @@ public final class RSAEncrypt {
 		try{
             keyPairGen = KeyPairGenerator.getInstance("RSA");
         }catch(NoSuchAlgorithmException e){
-		    throw new RuntimeException(e);
+		    throw new IllegalStateException(e);
         }
 
         keyPairGen.initialize(keySize, new SecureRandom());
@@ -46,7 +49,7 @@ public final class RSAEncrypt {
         try {
             return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyBytes));
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -60,7 +63,7 @@ public final class RSAEncrypt {
         try {
             return (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -82,7 +85,7 @@ public final class RSAEncrypt {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);  
             output = cipher.doFinal(plainTextData);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         return output;  
     }
@@ -105,7 +108,7 @@ public final class RSAEncrypt {
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);  
             output = cipher.doFinal(plainTextData);  
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         return output;
     }
@@ -129,7 +132,7 @@ public final class RSAEncrypt {
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             output = cipher.doFinal(cipherData);  
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         return output; 
     }
@@ -153,7 +156,7 @@ public final class RSAEncrypt {
             cipher.init(Cipher.DECRYPT_MODE, publicKey);  
             output = cipher.doFinal(cipherData);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         return output;
     }

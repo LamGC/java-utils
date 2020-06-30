@@ -6,6 +6,9 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+/**
+ * DH密钥交换
+ */
 public final class DiffieHellmanEncrypt {
 
     static {
@@ -21,11 +24,18 @@ public final class DiffieHellmanEncrypt {
 
     private KeyPair keyPair;
 
-
+    /**
+     * 使用默认的密钥长度构造一个DH密钥交换对象
+     * @see #DEFAULT_KEY_SIZE
+     */
     public DiffieHellmanEncrypt(){
         initKey(DEFAULT_KEY_SIZE);
     }
 
+    /**
+     * 构造一个DH密钥交换对象并指定DH密钥长度
+     * @param keySize 密钥长度
+     */
     public DiffieHellmanEncrypt(int keySize){
         initKey(keySize);
     }
@@ -40,7 +50,7 @@ public final class DiffieHellmanEncrypt {
         try {
             keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         //初始化密钥对生成器
         keyPairGenerator.initialize(keySize);
@@ -70,10 +80,17 @@ public final class DiffieHellmanEncrypt {
             PublicKey pubKey = keyFactory.generatePublic(x509KeySpec);
             return getSecretKey(pubKey, algorithm);
         }catch(NoSuchAlgorithmException | InvalidKeySpecException e){
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
+    /**
+     * 引入对方公钥, 构造指定算法的密钥
+     * @param publicKey 对方公钥
+     * @param algorithm 公共密钥算法
+     * @return 密钥对象
+     * @throws InvalidKeyException 当PublicKey无效时抛出
+     */
     public SecretKey getSecretKey(PublicKey publicKey, Algorithm algorithm) throws InvalidKeyException {
         try{
             KeyAgreement keyAgree = KeyAgreement.getInstance(KEY_ALGORITHM);
@@ -81,11 +98,11 @@ public final class DiffieHellmanEncrypt {
             keyAgree.doPhase(publicKey, true);
             return keyAgree.generateSecret(algorithm.algorithmName);
         }catch(NoSuchAlgorithmException e){
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
-
+    @SuppressWarnings("unused")
     public enum Algorithm{
         AES("AES"),
         RC2("RC2"),

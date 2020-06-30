@@ -6,6 +6,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
+/**
+ * Hmac加密工具类
+ * <p>通过该类可以很便捷的进行Hmac加密操作.</p>
+ */
 public final class HmacEncryptUtils {
 
     private HmacEncryptUtils() {}

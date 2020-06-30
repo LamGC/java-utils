@@ -29,7 +29,7 @@ public final class RSASign {
             priKey = KeyFactory.getInstance("RSA").generatePrivate(privatePKCS8);
             signature = Signature.getInstance(algorithm.algorithmName);
         }catch(NoSuchAlgorithmException e){
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         signature.initSign(priKey);
         signature.update(content);
@@ -71,7 +71,7 @@ public final class RSASign {
             pubKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(publicKey));
             signature = Signature.getInstance(algorithm.algorithmName);
         }catch(NoSuchAlgorithmException e){
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         signature.initVerify(pubKey);
         signature.update(content);

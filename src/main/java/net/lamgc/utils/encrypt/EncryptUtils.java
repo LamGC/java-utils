@@ -14,6 +14,7 @@ public final class EncryptUtils {
      * @param keyEncode 密钥编码数据
      * @param algorithm 密钥所属算法
      * @return SecretKey对象
+     * @throws NullPointerException 当byteEncode或algorithm为null时抛出
      */
     public static SecretKey BytesToSecretKey(byte[] keyEncode, String algorithm){
         Objects.requireNonNull(keyEncode);
@@ -26,8 +27,8 @@ public final class EncryptUtils {
      * @param encodeRules 密钥规则, 可以使用随机数据
      * @param keySize 随机源大小,默认128
      * @param keyAlgorithm 算法名
-     * @throws IllegalStateException 当传入的算法名不支持时抛出, 该异常的Cause为{@link NoSuchAlgorithmException}异常.
      * @return AES密钥
+     * @throws IllegalStateException 当传入的算法名不支持时抛出, 该异常的Cause为{@link NoSuchAlgorithmException}异常.
      */
     public static SecretKey getSecretKey(byte[] encodeRules, int keySize, String keyAlgorithm)
             throws IllegalStateException {

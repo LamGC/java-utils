@@ -1,10 +1,8 @@
 package net.lamgc.utils.encrypt;
 
 import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 /**
  * AES对称加密工具类
@@ -55,7 +53,7 @@ public final class AESEncrypt {
         try {
             cipher = Cipher.getInstance(Algorithm);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         //初始化为加密模式,导入密钥
         //初始化密码器
@@ -79,7 +77,7 @@ public final class AESEncrypt {
         try {
             cipher = Cipher.getInstance(Algorithm);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         //初始化为加密模式,导入密钥
         //初始化密码器

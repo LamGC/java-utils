@@ -4,10 +4,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
+/**
+ * 数据摘要工具类.
+ */
 public final class MessageDigestUtils {
 
     private MessageDigestUtils() {}
 
+    /**
+     * 对指定数据取摘要
+     * @param data 待取摘要的数据
+     * @param algorithm 数据摘要算法
+     * @return 返回数据摘要
+     */
     public static byte[] encrypt(byte[] data, Algorithm algorithm){
         MessageDigest digest;
         try {
