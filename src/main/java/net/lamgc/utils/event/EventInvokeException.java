@@ -1,7 +1,14 @@
 package net.lamgc.utils.event;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * 事件调用异常.
+ * <p>用于内部包装{@link InvocationTargetException}异常并传递给{@link EventUncaughtExceptionHandler}处理.</p>
+ * @see InvocationTargetException
+ * @see EventUncaughtExceptionHandler
+ */
 class EventInvokeException extends RuntimeException {
 
     private EventHandler handler;
