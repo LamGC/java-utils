@@ -37,7 +37,7 @@ public enum StringParser {
     }
 
     @FunctionalInterface
-    public interface ParserInterface <R>  {
+    public interface ParserInterface<R> {
         R parse(String content);
     }
 
