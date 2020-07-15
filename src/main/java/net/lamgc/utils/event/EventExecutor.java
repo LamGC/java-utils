@@ -101,11 +101,11 @@ public class EventExecutor {
      * @param eventObject 带有事件参数的事件对象
      */
     public void executor(final EventObject eventObject){
-        Set<Method> eventHandlerMethod = eventHandlerList.getEventHandlerMethod(eventObject.getClass());
-        if(eventHandlerMethod == null){
+        Set<Method> eventHandlerMethodSet = eventHandlerList.getEventHandlerMethod(eventObject.getClass());
+        if(eventHandlerMethodSet == null || eventHandlerMethodSet.isEmpty()){
             return;
         }
-        eventHandlerMethod.forEach(method -> {
+        eventHandlerMethodSet.forEach(method -> {
             final Set<EventHandler> handlerSet = eventHandlerObjectMap.getHandlerObject(method.getDeclaringClass());
             threadPoolExecutor.execute(() ->
                     handlerSet.forEach(handler -> executeEvent(handler, eventObject, method, null)));
@@ -119,14 +119,14 @@ public class EventExecutor {
      * @throws InterruptedException 当等待执行完成时发生中断, 则抛出异常.
      */
     public void executorSync(final EventObject eventObject) throws InterruptedException {
-        Set<Method> eventHandlerMethod = eventHandlerList.getEventHandlerMethod(eventObject.getClass());
-        if(eventHandlerMethod == null){
+        Set<Method> eventHandlerMethodSet = eventHandlerList.getEventHandlerMethod(eventObject.getClass());
+        if(eventHandlerMethodSet == null || eventHandlerMethodSet.isEmpty()){
             return;
         }
 
         final AtomicInteger executeCount = new AtomicInteger();
 
-        eventHandlerMethod.forEach(method -> {
+        eventHandlerMethodSet.forEach(method -> {
             final Set<EventHandler> handlerSet = eventHandlerObjectMap.getHandlerObject(method.getDeclaringClass());
             handlerSet.forEach(handler -> executeEvent(handler, eventObject, method, executeCount));
         });
@@ -282,6 +282,7 @@ public class EventExecutor {
      * @param shutdownNow 是否立刻关闭
      * @return 如果 {@code shutdownNow}为 {@code true}, 则返回线程池内未完成的事件任务.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public List<Runnable> shutdown(boolean shutdownNow){
         if (shutdownNow) {
             return threadPoolExecutor.shutdownNow();
@@ -338,7 +339,6 @@ public class EventExecutor {
 
         try {
             executor.executor(threadEventHandler.get(), threadEventObject.get());
-
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }

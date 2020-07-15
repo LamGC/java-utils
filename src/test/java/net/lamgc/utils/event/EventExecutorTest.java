@@ -96,6 +96,7 @@ public class EventExecutorTest {
         log.info("[{}] execute event", System.currentTimeMillis());
         executor.executorSync(new SimpleEventObject(1, "HelloWorld", invokeCount));
         log.info("[{}] done", System.currentTimeMillis());
+        System.gc();
     }
 
     @Test
@@ -165,6 +166,31 @@ public class EventExecutorTest {
             handlerException.set(true);
         });
 
+        SimpleEventHandler handler = new SimpleEventHandler("handler1");
+        executor.addHandler(handler);
+        executor.executor(new ExceptionThrowEvent(new NullPointerException()));
+        Thread.sleep(1000L);
+        Assert.assertTrue(handlerException.get());
+    }
+
+    @Test
+    public void threadUncaughtExceptionTest() throws IllegalAccessException, InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+
+        AtomicBoolean handlerException = new AtomicBoolean(false);
+        Thread.UncaughtExceptionHandler uncaughtExceptionHandler = (t, e) -> {
+            log.error("Thread({}) uncaught exception", t.getName());
+            e.printStackTrace();
+            handlerException.set(true);
+        };
+        executor.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+        Assert.assertEquals(uncaughtExceptionHandler, executor.getExceptionHandler());
         SimpleEventHandler handler = new SimpleEventHandler("handler1");
         executor.addHandler(handler);
         executor.executor(new ExceptionThrowEvent(new NullPointerException()));
@@ -308,6 +334,20 @@ public class EventExecutorTest {
         threadPoolExecutor.shutdown();
         executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         Assert.assertEquals(1, invokeCount.get());
+    }
+
+    @Test
+    public void emptyHandlerTest() throws InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                1,
+                (int) Math.ceil(Runtime.getRuntime().availableProcessors() / 2F),
+                30L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(10)
+        );
+        EventExecutor executor = new EventExecutor(threadPoolExecutor);
+        executor.executor(new SimpleEventObject(0, "test", null));
+        executor.executorSync(new SimpleEventObject(0, "test", null));
+        executor.shutdown(false);
     }
 
 }
