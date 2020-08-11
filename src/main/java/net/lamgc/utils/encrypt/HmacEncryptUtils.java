@@ -31,7 +31,7 @@ public final class HmacEncryptUtils {
             mac.init(key);
             return mac.doFinal(data);
         } catch(NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
