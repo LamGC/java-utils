@@ -23,7 +23,7 @@ public final class MessageDigestUtils {
             digest = MessageDigest.getInstance(Objects.requireNonNull(algorithm).algorithmName);
             digest.update(Objects.requireNonNull(data));
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         return digest.digest();
     }

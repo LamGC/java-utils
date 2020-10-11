@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class BasicEventHandlerList implements EventHandlerList {
 
-    private Hashtable<Class<? extends EventObject>, HashSet<Method>> eventMethodMap = new Hashtable<>();
+    private final Hashtable<Class<? extends EventObject>, HashSet<Method>> eventMethodMap = new Hashtable<>();
 
     @Override
     public Set<Method> getEventHandlerMethod(final Class<? extends EventObject> eventObject) {
