@@ -321,9 +321,9 @@ public class EventExecutor {
      * 清除事件重投信息.
      */
     private static void clearThreadResendInfo() {
-        threadEventExecutor.set(null);
-        threadEventHandler.set(null);
-        threadEventObject.set(null);
+        threadEventExecutor.remove();
+        threadEventHandler.remove();
+        threadEventObject.remove();
     }
 
     /**
@@ -338,7 +338,8 @@ public class EventExecutor {
         }
 
         try {
-            executor.executor(threadEventHandler.get(), threadEventObject.get());
+            executor.executor(
+                    Objects.requireNonNull(threadEventHandler.get()), Objects.requireNonNull(threadEventObject.get()));
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
